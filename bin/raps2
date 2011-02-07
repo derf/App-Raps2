@@ -1,0 +1,294 @@
+#!/usr/bin/env perl
+## Copyright © 2011 by Daniel Friesel <derf@finalrewind.org>
+## License: WTFPL:
+##   0. You just DO WHAT THE FUCK YOU WANT TO.
+use strict;
+use warnings;
+use 5.010;
+use autodie;
+
+use Crypt::CBC;
+use Crypt::Eksblowfish;
+use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash en_base64 de_base64);
+use File::Path qw(make_path);
+use File::Slurp qw(slurp write_file);
+use Getopt::Std;
+use POSIX;
+
+my $VERSION = '0.1';
+
+my %state = (
+	cost => 12,
+	salt => new_salt(),
+);
+
+my ($action, @args) = @ARGV;
+
+my %opt;
+
+sub cmd_add {
+	my ($name) = @_;
+	my $init = get_xdg_config_home() . '/init';
+	my $store = get_xdg_data_home() . "/${name}";
+	my $pass;
+
+	if (-e $store) {
+		die("This password name already exists\n");
+	}
+
+	my $cipher;
+	my $password;
+
+	$password = get_password();
+	undef %state;
+	load_state_from($init);
+	$state{'salt'} = new_salt();
+	$state{'cost'} //= 12;
+
+	$state{'url'} = read_input(
+		prefix => 'URL'
+	);
+	$state{'login'} = read_input(
+		prefix => 'Login'
+	);
+	$pass = read_input(
+		prefix => 'Password',
+		invisible => 1,
+		verify => 1,
+	);
+
+	$cipher = setup_cipher($password);
+
+	$state{'hash'} = $cipher->encrypt_hex($pass);
+
+	save_state_to($store);
+}
+
+sub cmd_get {
+	my ($name) = @_;
+	my $store = get_xdg_data_home() . "/${name}";
+	my $password;
+	my $cipher;
+
+	if (not -e $store) {
+		die("No such password\n");
+	}
+
+	$password = get_password();
+	load_state_from($store);
+
+	$cipher = setup_cipher($password);
+
+	printf(
+		"URL     : %s\nLogin   : %s\nPassword: %s\n",
+		$state{'url'},
+		$state{'login'},
+		$cipher->decrypt_hex($state{'hash'}),
+	);
+}
+
+sub create_dot_dirs {
+	make_path(get_xdg_config_home());
+	make_path(get_xdg_data_home());
+}
+
+sub create_pass {
+	my ($passfile) = @_;
+	my $pass;
+	my $hash;
+
+	say "raps2 was never run before. Please set master password first.";
+	$pass = read_input(
+		prefix => 'Password',
+		invisible => 1,
+		verify => 1,
+	);
+
+	$hash = en_base64(bcrypt_hash({
+			key_nul => 1,
+			cost => $state{'cost'},
+			salt => $state{'salt'},
+		}, $pass));
+	write_file(
+		$passfile,
+		"cost $state{cost}\n",
+		"salt $state{salt}\n",
+		"hash $hash\n",
+	);
+
+	return $pass;
+}
+
+sub get_password {
+	my $pass;
+	my $passfile = get_xdg_config_home() . '/password';
+
+	if (not -e $passfile) {
+		 return create_pass($passfile);
+	}
+
+	load_state_from($passfile);
+	$pass = read_input(
+		prefix => 'Master password',
+		invisible => 1,
+	);
+	if (en_base64(bcrypt_hash({
+				key_nul => 1,
+				cost => $state{'cost'},
+				salt => $state{'salt'},
+			}, $pass)) ne $state{'hash'}) {
+		die("Invalid passphrase\n");
+	}
+
+	return $pass;
+}
+
+sub get_xdg_config_home {
+	my $env  = $ENV{'XDG_CONFIG_HOME'};
+	my $home = $ENV{'HOME'};
+
+	if ($env) {
+		return "${env}/raps2";
+	}
+	else {
+		return "${home}/.config/raps2";
+	}
+}
+
+sub get_xdg_data_home {
+	my $env  = $ENV{'XDG_DATA_HOME'};
+	my $home = $ENV{'HOME'};
+
+	if ($env) {
+		return "${env}/raps2";
+	}
+	else {
+		return "${home}/.local/share/raps2";
+	}
+}
+
+sub load_state_from {
+	my ($file) = @_;
+
+	if (not -e $file) {
+		return;
+	}
+
+	for my $line (slurp($file)) {
+		my ($key, $value) = split(qr{\s+}, $line);
+
+		if (not ($key and $value)) {
+			next;
+		}
+
+		$state{$key} = $value;
+	}
+	return;
+}
+
+sub new_salt {
+	my $salt = q{};
+
+	for (1 .. 16) {
+		$salt .= chr(0x21 + int(rand(90)));
+	}
+
+	return $salt;
+}
+
+sub save_state_to {
+	my ($file) = @_;
+	my $raw = q{};
+
+	while (my ($key, $value) = each(%state)) {
+		$raw .= "${key} ${value}\n";
+	}
+
+	write_file($file, $raw);
+}
+
+sub setup_cipher {
+	my ($password) = @_;
+
+	my $eksblowfish = Crypt::Eksblowfish->new(
+		$state{'cost'},
+		$state{'salt'},
+		$password,
+	);
+	return Crypt::CBC->new(-cipher => $eksblowfish);
+}
+
+sub read_input {
+	my %opts = @_;
+	my ($prefix, $invisible, $verify)
+		= @opts{'prefix', 'invisible', 'verify'};
+	my $term = POSIX::Termios->new();
+	my ($input1, $input2);
+
+	if ($invisible) {
+		$term->getattr(0);
+		$term->setlflag($term->getlflag() & ~POSIX::ECHO);
+		$term->setattr(0, POSIX::TCSANOW);
+	}
+
+	print "${prefix}: ";
+	$input1 = readline(STDIN);
+
+	if ($invisible) {
+		print "\n";
+	}
+
+	if ($verify) {
+		print "Verify: ";
+		$input2 = readline(STDIN);
+
+		if ($invisible) {
+			print "\n";
+		}
+	}
+
+	if ($invisible) {
+		$term->setlflag($term->getlflag() | POSIX::ECHO);
+		$term->setattr(0, POSIX::TCSANOW);
+	}
+
+	if ($verify and $input1 ne $input2) {
+		die("Lines do not match\n");
+	}
+
+	chomp $input1;
+	return $input1;
+}
+
+create_dot_dirs();
+
+given ($action) {
+	when ('add')  { cmd_add(@args) }
+	when ('get')  { cmd_get(@args) }
+}
+
+__END__
+
+=head1 NAME
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=head1 EXIT STATUS
+
+=head1 CONFIGURATION
+
+=head1 DEPENDENCIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Copyright (C) 2011 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
