@@ -51,6 +51,9 @@ sub cmd_add {
 	$state{'login'} = read_input(
 		prefix => 'Login'
 	);
+	$state{'extra'} = read_input(
+		prefix => 'Extra'
+	);
 	$pass = read_input(
 		prefix => 'Password',
 		invisible => 1,
@@ -79,11 +82,23 @@ sub cmd_get {
 
 	$cipher = setup_cipher($password);
 
+	to_clipboard($cipher->decrypt_hex($state{'hash'}));
+}
+
+sub cmd_info {
+	my ($name) = @_;
+	my $store = get_xdg_data_home() . "/${name}";
+
+	if (not -e $store) {
+		die("No such password\n");
+	}
+
+	load_state_from($store);
+
 	printf(
-		"URL     : %s\nLogin   : %s\nPassword: %s\n",
+		"URL  : %s\nLogin: %s\n",
 		$state{'url'},
-		$state{'login'},
-		$cipher->decrypt_hex($state{'hash'}),
+		$state{'login'}
 	);
 }
 
@@ -218,6 +233,14 @@ sub setup_cipher {
 	return Crypt::CBC->new(-cipher => $eksblowfish);
 }
 
+sub to_clipboard {
+	my ($pw) = @_;
+
+	open(my $clipboard, '|-', 'xclip -l 1');
+	print $clipboard $pw;
+	close($clipboard);
+}
+
 sub read_input {
 	my %opts = @_;
 	my ($prefix, $invisible, $verify)
@@ -265,6 +288,7 @@ create_dot_dirs();
 given ($action) {
 	when ('add')  { cmd_add(@args) }
 	when ('get')  { cmd_get(@args) }
+	when ('info') { cmd_info(@args) }
 }
 
 __END__
