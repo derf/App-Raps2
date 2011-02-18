@@ -12,7 +12,6 @@ use Crypt::Eksblowfish;
 use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash en_base64 de_base64);
 use File::Path qw(make_path);
 use File::Slurp qw(slurp write_file);
-use Getopt::Std;
 use POSIX;
 
 my $VERSION = '0.1';
@@ -326,19 +325,73 @@ __END__
 
 =head1 NAME
 
+raps2 - "Right, Another Password Store" take two
+
 =head1 SYNOPSIS
+
+B<raps2> I<action> I<args ...>
 
 =head1 DESCRIPTION
 
-=head1 OPTIONS
+raps2 is a simple password safe.  You give it a name, a password and optional
+metadata, and it will encrypt and store them for you.  You probably want to
+start with C<< raps2 add accountname >>, and then later use C<< raps2 get
+accountname >> and paste the corresponding password into whatever application
+requires it.  B<raps2> will automatically initialize its store when used for
+the first time.
+
+=head1 ACTIONS
+
+=over
+
+=item B<add> I<account>
+
+Adds I<account> to the store.  It will ask you for the store's master
+password, some metadata and the new password and then store them.  Note that
+only the password is encrypted, the metadata is saved as clear-text.
+
+=item B<dump> I<account>
+
+Dump everything saved for I<account>, including the clear-text password, to
+stdout.
+
+=item B<get> I<account>
+
+Decrypt I<account>'s password and store it in the X Clipboard.  Note that it
+can only be pasted once.
+
+=item B<info> I<account>
+
+Show information about I<account>, does not require the master password.
+
+=back
 
 =head1 EXIT STATUS
 
+zero on success, non-zero otherwise.
+
 =head1 CONFIGURATION
+
+None so far.
 
 =head1 DEPENDENCIES
 
+=over
+
+=item * Crypt::CBC
+
+=item * Crypt::Eksblowfish
+
+=item * File::Path (usually included with perl core)
+
+=item * File::Slurp
+
+=back
+
 =head1 BUGS AND LIMITATIONS
+
+This is alpha software, the store format may change without further notice.
+Backwards-compatibility is not guaranteed.
 
 =head1 AUTHOR
 
