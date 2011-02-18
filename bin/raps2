@@ -24,8 +24,6 @@ my %state = (
 
 my ($action, @args) = @ARGV;
 
-my %opt;
-
 sub cmd_add {
 	my ($name) = @_;
 	my $init = get_xdg_config_home() . '/init';
@@ -65,6 +63,8 @@ sub cmd_add {
 	$state{'hash'} = $cipher->encrypt_hex($pass);
 
 	save_state_to($store);
+
+	return;
 }
 
 sub cmd_dump {
@@ -88,6 +88,8 @@ sub cmd_dump {
 		'Extra'   , $state{'extra'} // q{},
 		'Password', $cipher->decrypt_hex($state{'hash'}),
 	);
+
+	return;
 }
 
 sub cmd_get {
@@ -106,6 +108,8 @@ sub cmd_get {
 	$cipher = setup_cipher($password);
 
 	to_clipboard($cipher->decrypt_hex($state{'hash'}));
+
+	return;
 }
 
 sub cmd_info {
@@ -123,11 +127,14 @@ sub cmd_info {
 		$state{'url'},
 		$state{'login'}
 	);
+
+	return;
 }
 
 sub create_dot_dirs {
 	make_path(get_xdg_config_home());
 	make_path(get_xdg_data_home());
+	return;
 }
 
 sub create_pass {
@@ -135,7 +142,7 @@ sub create_pass {
 	my $pass;
 	my $hash;
 
-	say "raps2 was never run before. Please set master password first.";
+	say 'raps2 was never run before. Please set master password first.';
 	$pass = read_input(
 		prefix => 'Password',
 		invisible => 1,
@@ -188,9 +195,8 @@ sub get_xdg_config_home {
 	if ($env) {
 		return "${env}/raps2";
 	}
-	else {
-		return "${home}/.config/raps2";
-	}
+
+	return "${home}/.config/raps2";
 }
 
 sub get_xdg_data_home {
@@ -200,9 +206,8 @@ sub get_xdg_data_home {
 	if ($env) {
 		return "${env}/raps2";
 	}
-	else {
-		return "${home}/.local/share/raps2";
-	}
+
+	return "${home}/.local/share/raps2";
 }
 
 sub load_state_from {
@@ -243,6 +248,7 @@ sub save_state_to {
 	}
 
 	write_file($file, $raw);
+	return;
 }
 
 sub setup_cipher {
@@ -262,6 +268,7 @@ sub to_clipboard {
 	open(my $clipboard, '|-', 'xclip -l 1');
 	print $clipboard $pw;
 	close($clipboard);
+	return;
 }
 
 sub read_input {
@@ -285,7 +292,7 @@ sub read_input {
 	}
 
 	if ($verify) {
-		print "Verify: ";
+		print 'Verify: ';
 		$input2 = readline(STDIN);
 
 		if ($invisible) {
