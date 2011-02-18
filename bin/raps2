@@ -67,6 +67,29 @@ sub cmd_add {
 	save_state_to($store);
 }
 
+sub cmd_dump {
+	my ($name) = @_;
+	my $store = get_xdg_data_home() . "/${name}";
+	my $password;
+	my $cipher;
+
+	if (not -e $store) {
+		die("No such password\n");
+	}
+
+	$password = get_password();
+	load_state_from($store);
+	$cipher = setup_cipher($password);
+
+	printf(
+		"%-12s %s\n" x 4,
+		'URL'     , $state{'url'},
+		'Login'   , $state{'login'},
+		'Extra'   , $state{'extra'} // q{},
+		'Password', $cipher->decrypt_hex($state{'hash'}),
+	);
+}
+
 sub cmd_get {
 	my ($name) = @_;
 	my $store = get_xdg_data_home() . "/${name}";
@@ -287,6 +310,7 @@ create_dot_dirs();
 
 given ($action) {
 	when ('add')  { cmd_add(@args) }
+	when ('dump') { cmd_dump(@args) }
 	when ('get')  { cmd_get(@args) }
 	when ('info') { cmd_info(@args) }
 }
