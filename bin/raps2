@@ -81,7 +81,7 @@ sub cmd_dump {
 	$cipher = setup_cipher($password);
 
 	printf(
-		"%-12s %s\n" x 4,
+		"%-8s : %s\n" x 4,
 		'URL'     , $state{'url'},
 		'Login'   , $state{'login'},
 		'Extra'   , $state{'extra'} // q{},
@@ -122,11 +122,11 @@ sub cmd_info {
 	load_state_from($store);
 
 	printf(
-		"URL  : %s\nLogin: %s\n",
-		$state{'url'},
-		$state{'login'}
+		"%-8s : %s\n" x 3,
+		'URL'  , $state{'url'},
+		'Login', $state{'login'},
+		'Extra', $state{'extra'},
 	);
-
 	return;
 }
 
