@@ -130,6 +130,16 @@ sub cmd_info {
 	return;
 }
 
+sub cmd_list {
+	opendir(my $dh, get_xdg_data_file());
+	my @entries = grep { /^[^.]/ } readdir($dh);
+	closedir($dh);
+
+	for my $file (sort @entries) {
+		say $file;
+	}
+}
+
 sub create_dot_dirs {
 	make_path(get_xdg_config_file());
 	make_path(get_xdg_data_file());
@@ -319,6 +329,7 @@ given ($action) {
 	when ('dump') { cmd_dump(@args) }
 	when ('get')  { cmd_get(@args) }
 	when ('info') { cmd_info(@args) }
+	when ('list') { cmd_list(@args) }
 }
 
 __END__
