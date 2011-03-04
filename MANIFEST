@@ -1,0 +1,6 @@
+bin/raps2
+Build.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00-compile.t
+t/10-pod-coverage.t
