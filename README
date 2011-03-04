@@ -1,20 +1,30 @@
 raps2 - "Right, another password store" take two
+------------------------------------------------
 
-Requires: 
+* <http://derf.homelinux.org/projects/raps2>
+
+Dependencies
+------------
+
  * perl version 5.10 or newer
  * Crypt::CBC
  * Crypt::Eksblowfish
  * File::Path
  * File::Slurp
 
-Installation:
+Installation
+------------
 
-> perl Build.PL
-> ./Build
-> sudo ./Build install
+$ perl Build.PL
+$ perl Build
+$ sudo perl Build install
 
 You can then run 'man raps2' for more information.
 
+Testing
+-------
 
-You may also run './Build test'. This will require the Test::More,
-Test::Compile and Test::Pod modules.
+$ perl Build test
+
+Note that this will require the Test::More, Test::Compile and Test::Pod
+modules.
