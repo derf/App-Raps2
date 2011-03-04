@@ -1,0 +1,5 @@
+git HEAD
+
+    * Eksblowfish crypto
+    * raps2 add/dump/get/info commands
+    * Supports URL, Login, Password and Extra fields
