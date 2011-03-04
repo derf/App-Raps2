@@ -125,7 +125,7 @@ sub cmd_info {
 		"%-8s : %s\n" x 3,
 		'URL'  , $state{'url'},
 		'Login', $state{'login'},
-		'Extra', $state{'extra'},
+		'Extra', $state{'extra'} // q{},
 	);
 	return;
 }
