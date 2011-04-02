@@ -1,0 +1,94 @@
+package App::Raps2::UI;
+
+use strict;
+use warnings;
+use autodie;
+use 5.010;
+
+use base 'Exporter';
+
+use POSIX;
+
+our @EXPORT_OK = ();
+our $VERSION = '0.1';
+
+sub new {
+	my ($obj) = @_;
+	my $ref = {};
+	return bless($ref, $obj);
+}
+
+sub read_line {
+	my ($self, $str) = @_;
+
+	print "${str}: ";
+	my $input = readline(STDIN);
+
+	chomp $input;
+	return $input;
+}
+
+sub read_multiline {
+	my ($self, $str) = @_;
+	my $in;
+
+	say "${str} (^D to quit)";
+
+	while (my $line = <STDIN>) {
+		$in .= $line;
+	}
+	return $in;
+}
+
+sub read_pw {
+	my ($self, $str, $verify) = @_;
+	my ($in1, $in2);
+
+	my $term = POSIX::Termios->new();
+	$term->getattr(0);
+	$term->setlflag($term->getlflag() & ~POSIX::ECHO);
+	$term->setattr(0, POSIX::TCSANOW);
+
+	print "${str}: ";
+	$in1 = readline(STDIN);
+	print "\n";
+
+	if ($verify) {
+		print 'Verify: ';
+		$in2 = readline(STDIN);
+		print "\n";
+	}
+
+	$term->setlflag($term->getlflag() | POSIX::ECHO);
+	$term->setattr(0, POSIX::TCSANOW);
+
+	if ($verify and $in1 ne $in2) {
+		return undef;
+	}
+
+	chomp $in1;
+	return $in1;
+}
+
+sub to_clipboard {
+	my ($self, $str) = @_;
+
+	open(my $clipboard, '|-', 'xclip -l 1');
+	print $clipboard $str;
+	close($clipboard);
+	return;
+}
+
+sub output {
+	my ($self, @out) = @_;
+
+	for my $pair (@out) {
+		printf(
+			"%-8s : %s\n",
+			@{$pair},
+		);
+	}
+	return;
+}
+
+1;
