@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 13;
+use Test::More tests => 19;
 use Test::Exception;
 
 my $pw;
@@ -23,6 +23,17 @@ throws_ok(
 throws_ok(
 	sub {
 		App::Raps2::Password->new(salt => $salt);
+	},
+	qr{no passphrase given},
+	'new() missing passphrase'
+);
+
+throws_ok(
+	sub {
+		App::Raps2::Password->new(
+			salt => $salt,
+			passphrase => q{}
+		);
 	},
 	qr{no passphrase given},
 	'new() missing passphrase'
@@ -87,4 +98,43 @@ throws_ok(
 	'verify: does not verify invalid hash'
 );
 
-ok($pw->verify($pw->crypt('truth')), 'crypt->verify okay')
+ok($pw->verify($pw->crypt('truth')), 'crypt->verify okay');
+
+throws_ok(
+	sub {
+		$pw->salt();
+	},
+	qr{incorrect salt length},
+	'salt: No argument',
+);
+
+throws_ok(
+	sub {
+		$pw->salt('');
+	},
+	qr{incorrect salt length},
+	'salt: Empty argument',
+);
+
+throws_ok(
+	sub {
+		$pw->salt('abcdefghijklmno');
+	},
+	qr{incorrect salt length},
+	'salt: One too short',
+);
+
+throws_ok(
+	sub {
+		$pw->salt($salt . 'z');
+	},
+	qr{incorrect salt length},
+	'salt: One too long',
+);
+
+lives_ok(
+	sub {
+		$pw->salt($salt);
+	},
+	'salt: Correct length',
+);
