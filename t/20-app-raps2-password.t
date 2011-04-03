@@ -12,24 +12,51 @@ my $pass = 'something';
 
 use_ok('App::Raps2::Password');
 
-throws_ok { App::Raps2::Password->new() } qr{incorrect salt length},
-	'new() missing salt and passphrase';
+throws_ok(
+	sub {
+		App::Raps2::Password->new();
+	},
+	qr{incorrect salt length},
+	'new() missing salt and passphrase'
+);
 
-throws_ok { App::Raps2::Password->new(salt => $salt) } qr{no passphrase given},
-	'new() missing passphrase';
+throws_ok(
+	sub {
+		App::Raps2::Password->new(salt => $salt);
+	},
+	qr{no passphrase given},
+	'new() missing passphrase'
+);
 
-throws_ok { App::Raps2::Password->new(passphrase => $pass) } qr{incorrect salt length},
-	'new() missing salt';
+throws_ok(
+	sub {
+		App::Raps2::Password->new(passphrase => $pass);
+	},
+	qr{incorrect salt length},
+	'new() missing salt'
+);
 
-throws_ok { App::Raps2::Password->new(
-		passphrase => $pass,
-		salt => 'abcdefghijklmno',
-	) } qr{incorrect salt length}, 'new() salt one too short';
+throws_ok(
+	sub {
+		App::Raps2::Password->new(
+			passphrase => $pass,
+			salt => 'abcdefghijklmno',
+		);
+	},
+	qr{incorrect salt length},
+	'new() salt one too short'
+);
 
-throws_ok { App::Raps2::Password->new(
-		passphrase => $pass,
-		salt => $salt . 'z',
-	) } qr{incorrect salt length}, 'new() salt one too long';
+throws_ok(
+	sub {
+		App::Raps2::Password->new(
+			passphrase => $pass,
+			salt => $salt . 'z',
+		);
+	},
+	qr{incorrect salt length},
+	'new() salt one too long'
+);
 
 $pw = App::Raps2::Password->new(
 	passphrase => $pass,
@@ -52,7 +79,12 @@ is($pw->decrypt($pw->encrypt('foo')), 'foo', 'encrypt->decrypt okay');
 
 ok($pw->verify('3lJRlaRuOGWv/z3g1DAOlcH.u9vS8Wm'), 'verify: verifies correct hash');
 
-throws_ok { $pw->verify('3lJRlaRuOGWv/z3g1DAOlcH.u9vS8WM') } qr{Passwords did not match},
-'verify: does not verify invalid hash';
+throws_ok(
+	sub {
+		$pw->verify('3lJRlaRuOGWv/z3g1DAOlcH.u9vS8WM');
+	},
+	qr{Passwords did not match},
+	'verify: does not verify invalid hash'
+);
 
 ok($pw->verify($pw->crypt('truth')), 'crypt->verify okay')
