@@ -12,6 +12,7 @@ use base 'Exporter';
 
 use App::Raps2::Password;
 use App::Raps2::UI;
+use Carp q(confess);
 use File::Path qw(make_path);
 use File::Slurp qw(slurp write_file);
 
@@ -82,9 +83,7 @@ sub get_master_password {
 		passphrase => $pass,
 	);
 
-	if (not $self->{'pass'}->verify($self->{'master_hash'})) {
-		return undef;
-	}
+	$self->{'pass'}->verify($self->{'master_hash'});
 }
 
 sub create_config {
@@ -122,7 +121,7 @@ sub cmd_add {
 	my $ui = $self->{'ui'};
 
 	if (-e $pwfile) {
-		return undef;
+		confess('Password file already exists');
 	}
 
 	$self->get_master_password();
@@ -157,7 +156,7 @@ sub cmd_dump {
 	my $pwfile = $self->{'xdg_data'} . "/${name}";
 
 	if (not -e $pwfile) {
-		return undef;
+		confess('Password file does not exist');
 	}
 
 	my %key = file_to_hash($pwfile);
@@ -182,7 +181,7 @@ sub cmd_info {
 	my $pwfile = $self->{'xdg_data'} . "/${name}";
 
 	if (not -e $pwfile) {
-		return undef;
+		confess('Password file does not exist');
 	}
 
 	my %key = file_to_hash($pwfile);

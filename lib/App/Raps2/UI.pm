@@ -7,6 +7,7 @@ use 5.010;
 
 use base 'Exporter';
 
+use Carp qw(confess);
 use POSIX;
 
 our @EXPORT_OK = ();
@@ -63,7 +64,7 @@ sub read_pw {
 	$term->setattr(0, POSIX::TCSANOW);
 
 	if ($verify and $in1 ne $in2) {
-		return undef;
+		confess('Input lines did not match');
 	}
 
 	chomp $in1;

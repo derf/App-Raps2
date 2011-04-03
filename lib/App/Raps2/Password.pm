@@ -1,8 +1,5 @@
 package App::Raps2::Password;
 
-
-
-
 use strict;
 use warnings;
 use autodie;
@@ -10,6 +7,7 @@ use 5.010;
 
 use base 'Exporter';
 
+use Carp 'confess';
 use Crypt::CBC;
 use Crypt::Eksblowfish;
 use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash en_base64 de_base64);
@@ -23,11 +21,11 @@ sub new {
 	$conf{'cost'} //= 12;
 
 	if (not (defined $conf{'salt'} and length($conf{'salt'}) == 16)) {
-		return undef;
+		confess('incorrect salt length');
 	}
 
 	if (not (defined $conf{'passphrase'} and length $conf{'passphrase'})) {
-		return undef;
+		confess('no passphrase given');
 	}
 
 	my $ref = \%conf;
@@ -39,7 +37,7 @@ sub salt {
 	my ($self, $salt) = @_;
 
 	if (not (defined $salt and length($salt) == 16)) {
-		return undef;
+		confess('incorrect salt length');
 	}
 
 	$self->{'salt'} = $salt;
@@ -92,7 +90,7 @@ sub verify {
 	if ($testhash eq $myhash) {
 		return 1;
 	}
-	return undef;
+	confess('Passwords did not match');
 }
 
 1;
