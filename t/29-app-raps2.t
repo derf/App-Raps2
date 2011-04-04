@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 
 use Test::More tests => 4;
-use Test::Exception;
+use Test::Fatal;
 
 use_ok('App::Raps2');
 

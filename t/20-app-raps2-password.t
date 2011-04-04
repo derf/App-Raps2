@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 
 use Test::More tests => 19;
-use Test::Exception;
+use Test::Fatal;
 
 my $pw;
 my $salt = 'abcdefghijklmnop';
@@ -12,24 +12,24 @@ my $pass = 'something';
 
 use_ok('App::Raps2::Password');
 
-throws_ok(
-	sub {
+like(
+	exception {
 		App::Raps2::Password->new();
 	},
 	qr{incorrect salt length},
 	'new() missing salt and passphrase'
 );
 
-throws_ok(
-	sub {
+like(
+	exception {
 		App::Raps2::Password->new(salt => $salt);
 	},
 	qr{no passphrase given},
 	'new() missing passphrase'
 );
 
-throws_ok(
-	sub {
+like(
+	exception {
 		App::Raps2::Password->new(
 			salt => $salt,
 			passphrase => q{}
@@ -39,16 +39,16 @@ throws_ok(
 	'new() missing passphrase'
 );
 
-throws_ok(
-	sub {
+like(
+	exception {
 		App::Raps2::Password->new(passphrase => $pass);
 	},
 	qr{incorrect salt length},
 	'new() missing salt'
 );
 
-throws_ok(
-	sub {
+like(
+	exception {
 		App::Raps2::Password->new(
 			passphrase => $pass,
 			salt => 'abcdefghijklmno',
@@ -58,8 +58,8 @@ throws_ok(
 	'new() salt one too short'
 );
 
-throws_ok(
-	sub {
+like(
+	exception {
 		App::Raps2::Password->new(
 			passphrase => $pass,
 			salt => $salt . 'z',
@@ -90,8 +90,8 @@ is($pw->decrypt($pw->encrypt('foo')), 'foo', 'encrypt->decrypt okay');
 
 ok($pw->verify('3lJRlaRuOGWv/z3g1DAOlcH.u9vS8Wm'), 'verify: verifies correct hash');
 
-throws_ok(
-	sub {
+like(
+	exception {
 		$pw->verify('3lJRlaRuOGWv/z3g1DAOlcH.u9vS8WM');
 	},
 	qr{Passwords did not match},
@@ -100,41 +100,42 @@ throws_ok(
 
 ok($pw->verify($pw->crypt('truth')), 'crypt->verify okay');
 
-throws_ok(
-	sub {
+like(
+	exception {
 		$pw->salt();
 	},
 	qr{incorrect salt length},
 	'salt: No argument',
 );
 
-throws_ok(
-	sub {
+like(
+	exception {
 		$pw->salt('');
 	},
 	qr{incorrect salt length},
 	'salt: Empty argument',
 );
 
-throws_ok(
-	sub {
+like(
+	exception {
 		$pw->salt('abcdefghijklmno');
 	},
 	qr{incorrect salt length},
 	'salt: One too short',
 );
 
-throws_ok(
-	sub {
+like(
+	exception {
 		$pw->salt($salt . 'z');
 	},
 	qr{incorrect salt length},
 	'salt: One too long',
 );
 
-lives_ok(
-	sub {
+is(
+	exception {
 		$pw->salt($salt);
 	},
+	undef,
 	'salt: Correct length',
 );
