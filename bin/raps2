@@ -18,6 +18,7 @@ $raps2->load_config();
 given ($action) {
 	when ('add')  { $raps2->cmd_add(@args) }
 	when ('dump') { $raps2->cmd_dump(@args) }
+	when ('get')  { $raps2->cmd_get(@args) }
 	when ('info') { $raps2->cmd_info(@args) }
 }
 

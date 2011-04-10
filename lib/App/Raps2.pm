@@ -75,7 +75,7 @@ sub sanity_check {
 
 sub get_master_password {
 	my ($self) = @_;
-	my $pass = $self->{'ui'}->read_pw('Master Password', 0);
+	my $pass = $self->ui()->read_pw('Master Password', 0);
 
 	$self->{'pass'} = App::Raps2::Password->new(
 		cost => $self->{'default'}->{'cost'},
@@ -90,7 +90,7 @@ sub create_config {
 	my ($self) = @_;
 	my $cost = 12;
 	my $salt = create_salt();
-	my $pass = $self->{'ui'}->read_pw('Master Password', 1);
+	my $pass = $self->ui()->read_pw('Master Password', 1);
 
 	$self->{'pass'} = App::Raps2::Password->new(
 		cost => $cost,
@@ -115,10 +115,14 @@ sub load_config {
 	$self->{'default'}->{'cost'} //= $cfg{'cost'};
 }
 
+sub ui {
+	my ($self) = @_;
+	return $self->{'ui'};
+}
+
 sub cmd_add {
 	my ($self, $name) = @_;
 	my $pwfile = $self->{'xdg_data'} . "/${name}";
-	my $ui = $self->{'ui'};
 
 	if (-e $pwfile) {
 		confess('Password file already exists');
@@ -127,10 +131,10 @@ sub cmd_add {
 	$self->get_master_password();
 
 	my $salt = create_salt();
-	my $url = $ui->read_line('URL');
-	my $login = $ui->read_line('Login');
-	my $pass = $ui->read_pw('Password', 1);
-	my $extra = $ui->read_multiline('Additional content');
+	my $url = $self->ui()->read_line('URL');
+	my $login = $self->ui()->read_line('Login');
+	my $pass = $self->ui()->read_pw('Password', 1);
+	my $extra = $self->ui()->read_multiline('Additional content');
 
 	$self->{'pass'}->salt($salt);
 	my $pass_hash = $self->{'pass'}->encrypt($pass);
@@ -165,13 +169,34 @@ sub cmd_dump {
 
 	$self->{'pass'}->salt($key{'salt'});
 
-	$self->{'ui'}->output(
+	$self->ui()->output(
 		['URL', $key{'url'}],
 		['Login', $key{'login'}],
 		['Password', $self->{'pass'}->decrypt($key{'hash'})],
 	);
 	if ($key{'extra'}) {
-		say $self->{'pass'}->decrypt($key{'extra'});
+		print $self->{'pass'}->decrypt($key{'extra'});
+	}
+}
+
+sub cmd_get {
+	my ($self, $name) = @_;
+	my $pwfile = $self->{'xdg_data'} . "/${name}";
+
+	if (not -e $pwfile) {
+		confess('Password file does not exist');
+	}
+
+	my %key = file_to_hash($pwfile);
+
+	$self->get_master_password();
+
+	$self->{'pass'}->salt($key{'salt'});
+
+	$self->ui()->to_clipboard($self->{'pass'}->decrypt($key{'hash'}));
+
+	if ($key{'extra'}) {
+		print $self->{'pass'}->decrypt($key{'extra'})
 	}
 }
 
@@ -185,7 +210,7 @@ sub cmd_info {
 	}
 
 	my %key = file_to_hash($pwfile);
-	$self->{'ui'}->output(
+	$self->ui()->output(
 		['URL', $key{'url'}],
 		['Login', $key{'login'}],
 	);
