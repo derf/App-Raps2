@@ -86,7 +86,8 @@ sub output {
 	for my $pair (@out) {
 		printf(
 			"%-8s : %s\n",
-			@{$pair},
+			$pair->[0],
+			$pair->[1] // q{},
 		);
 	}
 	return;
