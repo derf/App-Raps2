@@ -12,7 +12,7 @@ my $build = Module::Build->new(
 		'Test::More' => 0,
 		'Test::Pod' => 0,
 	},
-	dist_name => 'raps2',
+	dist_name => 'App-Raps2',
 	dist_version_from => 'bin/raps2',
 	license => 'unrestricted',
 	requires => {
