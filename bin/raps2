@@ -12,6 +12,8 @@ use App::Raps2;
 my $raps2 = App::Raps2->new();
 my ($action, @args) = @ARGV;
 
+my $VERSION = '0.1';
+
 $raps2->sanity_check();
 $raps2->load_config();
 
@@ -20,6 +22,7 @@ given ($action) {
 	when ('dump') { $raps2->cmd_dump(@args) }
 	when ('get')  { $raps2->cmd_get(@args) }
 	when ('info') { $raps2->cmd_info(@args) }
+	when ('version') { say "raps2 version ${VERSION}" }
 }
 
 __END__
@@ -31,6 +34,10 @@ raps2 - "Right, Another Password Store" take two
 =head1 SYNOPSIS
 
 B<raps2> I<action> I<args ...>
+
+=head1 VERSION
+
+This manual documents B<raps2> version 0.1
 
 =head1 DESCRIPTION
 
@@ -73,7 +80,9 @@ zero on success, non-zero otherwise.
 
 =head1 CONFIGURATION
 
-None so far.
+raps2 saves the master password hash in F<~/.config/raps2/password>.
+
+Additional encrypted passwords are stored in F<~/.local/share/raps2/>.
 
 =head1 DEPENDENCIES
 
