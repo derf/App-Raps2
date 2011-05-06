@@ -87,6 +87,8 @@ None so far.
 
 =item * File::Slurp
 
+=item * xclip (for C<< raps2 get >>)
+
 =back
 
 =head1 BUGS AND LIMITATIONS
