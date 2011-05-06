@@ -92,6 +92,8 @@ Additional encrypted passwords are stored in F<~/.local/share/raps2/>.
 
 =item * Crypt::Eksblowfish
 
+=item * File::BaseDir
+
 =item * File::Path (usually included with perl core)
 
 =item * File::Slurp

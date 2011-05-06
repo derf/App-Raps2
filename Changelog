@@ -1,3 +1,8 @@
+git HEAD
+
+    * Fix XDG_CONFIG_HOME / XDG_DATA_HOME handling bug. Adds new dependency
+      File::BaseDir
+
 raps2 0.1 - Fri May 06 2011
 
     * Eksblowfish crypto

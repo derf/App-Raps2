@@ -9,6 +9,7 @@ Dependencies
  * perl version 5.10 or newer
  * Crypt::CBC
  * Crypt::Eksblowfish
+ * File::BaseDir
  * File::Path
  * File::Slurp
 

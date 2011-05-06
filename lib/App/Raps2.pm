@@ -38,6 +38,7 @@ use base 'Exporter';
 use App::Raps2::Password;
 use App::Raps2::UI;
 use Carp q(confess);
+use File::BaseDir qw(config_home data_home);
 use File::Path qw(make_path);
 use File::Slurp qw(slurp write_file);
 
@@ -105,9 +106,8 @@ sub new {
 	my ($obj, %conf) = @_;
 	my $ref = {};
 
-	$ref->{'xdg_conf'} = $ENV{'XDG_CONFIG_HOME'} // "$ENV{HOME}/.config/raps2";
-	$ref->{'xdg_data'} = $ENV{'XDG_DATA_HOME'} //
-		"$ENV{HOME}/.local/share/raps2";
+	$ref->{'xdg_conf'} = config_home('raps2');
+	$ref->{'xdg_data'} = data_home('raps2');
 
 	$ref->{'ui'} = App::Raps2::UI->new();
 
