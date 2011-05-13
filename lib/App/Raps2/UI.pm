@@ -8,7 +8,7 @@ use 5.010;
 use Carp qw(confess);
 use POSIX;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 sub new {
 	my ($obj) = @_;

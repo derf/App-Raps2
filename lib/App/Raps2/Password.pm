@@ -10,7 +10,7 @@ use Crypt::CBC;
 use Crypt::Eksblowfish;
 use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash en_base64 de_base64);
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 sub new {
 	my ($obj, %conf) = @_;

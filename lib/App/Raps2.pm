@@ -39,7 +39,7 @@ use File::BaseDir qw(config_home data_home);
 use File::Path qw(make_path);
 use File::Slurp qw(read_dir slurp write_file);
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 =head1 METHODS
 
@@ -345,6 +345,8 @@ sub cmd_list {
 		);
 	}
 }
+
+=back
 
 =head1 DEPENDENCIES
 

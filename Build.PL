@@ -12,9 +12,8 @@ my $build = Module::Build->new(
 		'Test::More' => 0,
 		'Test::Pod' => 0,
 	},
-	dist_name => 'App-Raps2',
-	dist_version_from => 'bin/raps2',
 	license => 'unrestricted',
+	module_name => 'App::Raps2',
 	requires => {
 		'perl' => '5.10.0',
 		'autodie' => 0,

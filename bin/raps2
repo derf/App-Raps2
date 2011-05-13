@@ -12,7 +12,7 @@ use App::Raps2;
 my $raps2 = App::Raps2->new();
 my ($action, @args) = @ARGV;
 
-my $VERSION = '0.1';
+my $VERSION = '0.2';
 
 $raps2->sanity_check();
 $raps2->load_config();
@@ -38,7 +38,7 @@ B<raps2> I<action> I<args ...>
 
 =head1 VERSION
 
-This manual documents B<raps2> version 0.1
+This manual documents B<raps2> version 0.2
 
 =head1 DESCRIPTION
 
