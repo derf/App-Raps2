@@ -22,6 +22,7 @@ given ($action) {
 	when ('dump') { $raps2->cmd_dump(@args) }
 	when ('get')  { $raps2->cmd_get(@args) }
 	when ('info') { $raps2->cmd_info(@args) }
+	when ('list') { $raps2->cmd_list(@args) }
 	when ('version') { say "raps2 version ${VERSION}" }
 }
 

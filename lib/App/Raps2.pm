@@ -40,7 +40,7 @@ use App::Raps2::UI;
 use Carp q(confess);
 use File::BaseDir qw(config_home data_home);
 use File::Path qw(make_path);
-use File::Slurp qw(slurp write_file);
+use File::Slurp qw(read_dir slurp write_file);
 
 our @EXPORT_OK = ();
 our $VERSION = '0.1';
@@ -326,4 +326,23 @@ sub cmd_info {
 		['URL', $key{'url'}],
 		['Login', $key{'login'}],
 	);
+}
+
+=head2 ->cmd_list()
+
+Lists all saved passwords and their logins and urls
+
+=cut
+
+sub cmd_list {
+	my ($self) = @_;
+
+	for my $file (read_dir($self->{xdg_data})) {
+		my %key = file_to_hash($self->{xdg_data} . "/${file}");
+		$self->ui->list(
+			['Account', $file],
+			['Login', $key{login}],
+			['URL', $key{url}],
+		);
+	}
 }

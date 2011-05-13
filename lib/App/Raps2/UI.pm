@@ -19,6 +19,17 @@ sub new {
 	return bless($ref, $obj);
 }
 
+sub list {
+	my ($self, @list) = @_;
+	my $format = "%-20s %-20s %s\n";
+
+	if (not $self->{list}->{header}) {
+		printf($format, map { $_->[0] } @list);
+		$self->{list}->{header} = 1;
+	}
+	printf($format, map { $_->[1] // q{} } @list);
+}
+
 sub read_line {
 	my ($self, $str) = @_;
 
