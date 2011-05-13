@@ -73,6 +73,10 @@ can only be pasted once.
 
 Show information about I<account>, does not require the master password.
 
+=item B<list>
+
+List all saved accounts with their respective Logins and URLs
+
 =back
 
 =head1 EXIT STATUS
