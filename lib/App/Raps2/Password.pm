@@ -5,14 +5,11 @@ use warnings;
 use autodie;
 use 5.010;
 
-use base 'Exporter';
-
 use Carp 'confess';
 use Crypt::CBC;
 use Crypt::Eksblowfish;
 use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash en_base64 de_base64);
 
-our @EXPORT_OK = ();
 our $VERSION = '0.1';
 
 sub new {

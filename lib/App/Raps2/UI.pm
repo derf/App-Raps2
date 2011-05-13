@@ -5,12 +5,9 @@ use warnings;
 use autodie;
 use 5.010;
 
-use base 'Exporter';
-
 use Carp qw(confess);
 use POSIX;
 
-our @EXPORT_OK = ();
 our $VERSION = '0.1';
 
 sub new {
