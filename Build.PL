@@ -26,5 +26,6 @@ my $build = Module::Build->new(
 		'POSIX' => 0,
 	},
 	script_files => 'bin/',
+	sign => 1,
 );
 $build->create_build_script();
