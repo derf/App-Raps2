@@ -45,7 +45,7 @@ our $VERSION = '0.1';
 
 =over
 
-=item $raps2 = App::Raps2->new(%conf)
+=item $raps2 = App::Raps2->new(I<%conf>)
 
 Returns a new B<App::Raps2> object.
 
@@ -92,7 +92,7 @@ sub create_salt {
 	return $salt;
 }
 
-=item $raps2->file_to_hash($file)
+=item $raps2->file_to_hash(I<$file>)
 
 Reads $file (lines with key/value separated by whitespace) and returns a hash
 with its key/value pairs.
@@ -208,7 +208,7 @@ sub ui {
 	return $self->{'ui'};
 }
 
-=item $raps2->cmd_add($name)
+=item $raps2->cmd_add(I<$name>)
 
 Adds a new password file called $name.
 
@@ -249,7 +249,7 @@ sub cmd_add {
 	);
 }
 
-=item $raps2->cmd_dump($name)
+=item $raps2->cmd_dump(I<$name>)
 
 Dumps the content of $name.
 
@@ -279,7 +279,7 @@ sub cmd_dump {
 	}
 }
 
-=item $raps2->cmd_get($name)
+=item $raps2->cmd_get(I<$name>)
 
 Puts the password saved in $name into the X clipboard.
 
@@ -306,7 +306,7 @@ sub cmd_get {
 	}
 }
 
-=item $raps2->cmd_info($name)
+=item $raps2->cmd_info(I<$name>)
 
 Prints unencrypted information about $name.
 
