@@ -15,13 +15,13 @@ our $VERSION = '0.1';
 sub new {
 	my ($obj, %conf) = @_;
 
-	$conf{'cost'} //= 12;
+	$conf{cost} //= 12;
 
-	if (not (defined $conf{'salt'} and length($conf{'salt'}) == 16)) {
+	if (not (defined $conf{salt} and length($conf{salt}) == 16)) {
 		confess('incorrect salt length');
 	}
 
-	if (not (defined $conf{'passphrase'} and length $conf{'passphrase'})) {
+	if (not (defined $conf{passphrase} and length $conf{passphrase})) {
 		confess('no passphrase given');
 	}
 
@@ -37,16 +37,16 @@ sub salt {
 		confess('incorrect salt length');
 	}
 
-	$self->{'salt'} = $salt;
+	$self->{salt} = $salt;
 }
 
 sub encrypt {
 	my ($self, $in) = @_;
 
 	my $eksblowfish = Crypt::Eksblowfish->new(
-		$self->{'cost'},
-		$self->{'salt'},
-		$self->{'passphrase'},
+		$self->{cost},
+		$self->{salt},
+		$self->{passphrase},
 	);
 	my $cbc = Crypt::CBC->new(-cipher => $eksblowfish);
 
@@ -57,9 +57,9 @@ sub decrypt {
 	my ($self, $in) = @_;
 
 	my $eksblowfish = Crypt::Eksblowfish->new(
-		$self->{'cost'},
-		$self->{'salt'},
-		$self->{'passphrase'},
+		$self->{cost},
+		$self->{salt},
+		$self->{passphrase},
 	);
 	my $cbc = Crypt::CBC->new(-cipher => $eksblowfish);
 
@@ -72,10 +72,10 @@ sub crypt {
 	return en_base64(
 		bcrypt_hash({
 				key_nul => 1,
-				cost => $self->{'cost'},
-				salt => $self->{'salt'},
+				cost => $self->{cost},
+				salt => $self->{salt},
 			},
-			$self->{'passphrase'},
+			$self->{passphrase},
 	));
 }
 

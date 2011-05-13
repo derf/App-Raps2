@@ -65,12 +65,12 @@ sub new {
 	my ($obj, %conf) = @_;
 	my $ref = {};
 
-	$ref->{'xdg_conf'} = config_home('raps2');
-	$ref->{'xdg_data'} = data_home('raps2');
+	$ref->{xdg_conf} = config_home('raps2');
+	$ref->{xdg_data} = data_home('raps2');
 
-	$ref->{'ui'} = App::Raps2::UI->new();
+	$ref->{ui} = App::Raps2::UI->new();
 
-	$ref->{'default'} = \%conf;
+	$ref->{default} = \%conf;
 
 	return bless($ref, $obj);
 }
@@ -127,10 +127,10 @@ Calls B<create_config> if no raps2 config was found.
 sub sanity_check {
 	my ($self) = @_;
 
-	make_path($self->{'xdg_conf'});
-	make_path($self->{'xdg_data'});
+	make_path($self->{xdg_conf});
+	make_path($self->{xdg_data});
 
-	if (not -e $self->{'xdg_conf'} . '/password') {
+	if (not -e $self->{xdg_conf} . '/password') {
 		$self->create_config();
 	}
 
@@ -147,13 +147,13 @@ sub get_master_password {
 	my ($self) = @_;
 	my $pass = $self->ui()->read_pw('Master Password', 0);
 
-	$self->{'pass'} = App::Raps2::Password->new(
-		cost => $self->{'default'}->{'cost'},
-		salt => $self->{'master_salt'},
+	$self->{pass} = App::Raps2::Password->new(
+		cost => $self->{default}->{cost},
+		salt => $self->{master_salt},
 		passphrase => $pass,
 	);
 
-	$self->{'pass'}->verify($self->{'master_hash'});
+	$self->{pass}->verify($self->{master_hash});
 }
 
 =item $raps2->create_config()
@@ -168,15 +168,15 @@ sub create_config {
 	my $salt = $self->create_salt();
 	my $pass = $self->ui()->read_pw('Master Password', 1);
 
-	$self->{'pass'} = App::Raps2::Password->new(
+	$self->{pass} = App::Raps2::Password->new(
 		cost => $cost,
 		salt => $salt,
 		passphrase => $pass,
 	);
-	my $hash = $self->{'pass'}->crypt();
+	my $hash = $self->{pass}->crypt();
 
 	write_file(
-		$self->{'xdg_conf'} . '/password',
+		$self->{xdg_conf} . '/password',
 		"cost ${cost}\n",
 		"salt ${salt}\n",
 		"hash ${hash}\n",
@@ -191,10 +191,10 @@ Load config
 
 sub load_config {
 	my ($self) = @_;
-	my %cfg = $self->file_to_hash($self->{'xdg_conf'} . '/password');
-	$self->{'master_hash'} = $cfg{'hash'};
-	$self->{'master_salt'} = $cfg{'salt'};
-	$self->{'default'}->{'cost'} //= $cfg{'cost'};
+	my %cfg = $self->file_to_hash($self->{xdg_conf} . '/password');
+	$self->{master_hash} = $cfg{hash};
+	$self->{master_salt} = $cfg{salt};
+	$self->{default}->{cost} //= $cfg{cost};
 }
 
 =item $raps2->ui()
@@ -205,7 +205,7 @@ Returns the App::Raps2::UI(3pm) object.
 
 sub ui {
 	my ($self) = @_;
-	return $self->{'ui'};
+	return $self->{ui};
 }
 
 =item $raps2->cmd_add(I<$name>)
@@ -216,7 +216,7 @@ Adds a new password file called $name.
 
 sub cmd_add {
 	my ($self, $name) = @_;
-	my $pwfile = $self->{'xdg_data'} . "/${name}";
+	my $pwfile = $self->{xdg_data} . "/${name}";
 
 	if (-e $pwfile) {
 		confess('Password file already exists');
@@ -230,11 +230,11 @@ sub cmd_add {
 	my $pass = $self->ui()->read_pw('Password', 1);
 	my $extra = $self->ui()->read_multiline('Additional content');
 
-	$self->{'pass'}->salt($salt);
-	my $pass_hash = $self->{'pass'}->encrypt($pass);
+	$self->{pass}->salt($salt);
+	my $pass_hash = $self->{pass}->encrypt($pass);
 	my $extra_hash = (
 		$extra ?
-		$self->{'pass'}->encrypt($extra) :
+		$self->{pass}->encrypt($extra) :
 		q{}
 	);
 
@@ -257,7 +257,7 @@ Dumps the content of $name.
 
 sub cmd_dump {
 	my ($self, $name) = @_;
-	my $pwfile = $self->{'xdg_data'} . "/${name}";
+	my $pwfile = $self->{xdg_data} . "/${name}";
 
 	if (not -e $pwfile) {
 		confess('Password file does not exist');
@@ -267,15 +267,15 @@ sub cmd_dump {
 
 	$self->get_master_password();
 
-	$self->{'pass'}->salt($key{'salt'});
+	$self->{pass}->salt($key{salt});
 
 	$self->ui()->output(
-		['URL', $key{'url'}],
-		['Login', $key{'login'}],
-		['Password', $self->{'pass'}->decrypt($key{'hash'})],
+		['URL', $key{url}],
+		['Login', $key{login}],
+		['Password', $self->{pass}->decrypt($key{hash})],
 	);
-	if ($key{'extra'}) {
-		print $self->{'pass'}->decrypt($key{'extra'});
+	if ($key{extra}) {
+		print $self->{pass}->decrypt($key{extra});
 	}
 }
 
@@ -287,7 +287,7 @@ Puts the password saved in $name into the X clipboard.
 
 sub cmd_get {
 	my ($self, $name) = @_;
-	my $pwfile = $self->{'xdg_data'} . "/${name}";
+	my $pwfile = $self->{xdg_data} . "/${name}";
 
 	if (not -e $pwfile) {
 		confess('Password file does not exist');
@@ -297,12 +297,12 @@ sub cmd_get {
 
 	$self->get_master_password();
 
-	$self->{'pass'}->salt($key{'salt'});
+	$self->{pass}->salt($key{salt});
 
-	$self->ui()->to_clipboard($self->{'pass'}->decrypt($key{'hash'}));
+	$self->ui()->to_clipboard($self->{pass}->decrypt($key{hash}));
 
-	if ($key{'extra'}) {
-		print $self->{'pass'}->decrypt($key{'extra'})
+	if ($key{extra}) {
+		print $self->{pass}->decrypt($key{extra})
 	}
 }
 
@@ -314,7 +314,7 @@ Prints unencrypted information about $name.
 
 sub cmd_info {
 	my ($self, $name) = @_;
-	my $pwfile = $self->{'xdg_data'} . "/${name}";
+	my $pwfile = $self->{xdg_data} . "/${name}";
 
 	if (not -e $pwfile) {
 		confess('Password file does not exist');
@@ -322,8 +322,8 @@ sub cmd_info {
 
 	my %key = $self->file_to_hash($pwfile);
 	$self->ui()->output(
-		['URL', $key{'url'}],
-		['Login', $key{'login'}],
+		['URL', $key{url}],
+		['Login', $key{login}],
 	);
 }
 
