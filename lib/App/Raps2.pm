@@ -27,66 +27,25 @@ B<App::Raps2> is the backend for B<raps2>, a simple commandline password safe.
 
 =cut
 
-
 use strict;
 use warnings;
 use autodie;
 use 5.010;
 
-use base 'Exporter';
-
 use App::Raps2::Password;
 use App::Raps2::UI;
-use Carp q(confess);
+use Carp qw(confess);
 use File::BaseDir qw(config_home data_home);
 use File::Path qw(make_path);
 use File::Slurp qw(read_dir slurp write_file);
 
-our @EXPORT_OK = ();
 our $VERSION = '0.1';
 
 =head1 METHODS
 
-=head2 create_salt()
+=over
 
-Returns a 16-character random salt for App::Raps2::Password(3pm).
-
-=cut
-
-sub create_salt {
-	my $salt = q{};
-
-	for (1 .. 16) {
-		$salt .= chr(0x21 + int(rand(90)));
-	}
-
-	return $salt;
-}
-
-=head2 file_to_hash($file)
-
-Reads $file (lines with key/value separated by whitespace) and returns a hash
-with its key/value pairs.
-
-=cut
-
-sub file_to_hash {
-	my ($file) = @_;
-	my %ret;
-
-	for my $line (slurp($file)) {
-		my ($key, $value) = split(qr{\s+}, $line);
-
-		if (not ($key and $value)) {
-			next;
-		}
-
-		$ret{$key} = $value;
-	}
-	return %ret;
-}
-
-=head2 new(%conf)
+=item $raps2 = App::Raps2->new(%conf)
 
 Returns a new B<App::Raps2> object.
 
@@ -116,7 +75,47 @@ sub new {
 	return bless($ref, $obj);
 }
 
-=head2 ->sanity_check()
+=item $raps2->create_salt()
+
+Returns a 16-character random salt for App::Raps2::Password(3pm).
+
+=cut
+
+sub create_salt {
+	my ($self) = @_;
+	my $salt = q{};
+
+	for (1 .. 16) {
+		$salt .= chr(0x21 + int(rand(90)));
+	}
+
+	return $salt;
+}
+
+=item $raps2->file_to_hash($file)
+
+Reads $file (lines with key/value separated by whitespace) and returns a hash
+with its key/value pairs.
+
+=cut
+
+sub file_to_hash {
+	my ($self, $file) = @_;
+	my %ret;
+
+	for my $line (slurp($file)) {
+		my ($key, $value) = split(qr{\s+}, $line);
+
+		if (not ($key and $value)) {
+			next;
+		}
+
+		$ret{$key} = $value;
+	}
+	return %ret;
+}
+
+=item $raps2->sanity_check()
 
 Create working directories (~/.config/raps2 and ~/.local/share/raps2, or the
 respective XDG environment variable contents), if they don't exist yet.
@@ -138,7 +137,7 @@ sub sanity_check {
 	return;
 }
 
-=head2 ->get_master_password()
+=item $raps2->get_master_password()
 
 Asks the user for the master passphrase.
 
@@ -157,7 +156,7 @@ sub get_master_password {
 	$self->{'pass'}->verify($self->{'master_hash'});
 }
 
-=head2 ->create_config()
+=item $raps2->create_config()
 
 Creates a default config and asks the user to set a master password.
 
@@ -166,7 +165,7 @@ Creates a default config and asks the user to set a master password.
 sub create_config {
 	my ($self) = @_;
 	my $cost = 12;
-	my $salt = create_salt();
+	my $salt = $self->create_salt();
 	my $pass = $self->ui()->read_pw('Master Password', 1);
 
 	$self->{'pass'} = App::Raps2::Password->new(
@@ -184,7 +183,7 @@ sub create_config {
 	);
 }
 
-=head2 ->load_config()
+=item $raps2->load_config()
 
 Load config
 
@@ -192,13 +191,13 @@ Load config
 
 sub load_config {
 	my ($self) = @_;
-	my %cfg = file_to_hash($self->{'xdg_conf'} . '/password');
+	my %cfg = $self->file_to_hash($self->{'xdg_conf'} . '/password');
 	$self->{'master_hash'} = $cfg{'hash'};
 	$self->{'master_salt'} = $cfg{'salt'};
 	$self->{'default'}->{'cost'} //= $cfg{'cost'};
 }
 
-=head2 ->ui()
+=item $raps2->ui()
 
 Returns the App::Raps2::UI(3pm) object.
 
@@ -209,7 +208,7 @@ sub ui {
 	return $self->{'ui'};
 }
 
-=head2 ->cmd_add($name)
+=item $raps2->cmd_add($name)
 
 Adds a new password file called $name.
 
@@ -225,7 +224,7 @@ sub cmd_add {
 
 	$self->get_master_password();
 
-	my $salt = create_salt();
+	my $salt = $self->create_salt();
 	my $url = $self->ui()->read_line('URL');
 	my $login = $self->ui()->read_line('Login');
 	my $pass = $self->ui()->read_pw('Password', 1);
@@ -250,7 +249,7 @@ sub cmd_add {
 	);
 }
 
-=head2 ->cmd_dump($name)
+=item $raps2->cmd_dump($name)
 
 Dumps the content of $name.
 
@@ -264,7 +263,7 @@ sub cmd_dump {
 		confess('Password file does not exist');
 	}
 
-	my %key = file_to_hash($pwfile);
+	my %key = $self->file_to_hash($pwfile);
 
 	$self->get_master_password();
 
@@ -280,7 +279,7 @@ sub cmd_dump {
 	}
 }
 
-=head2 ->cmd_get($name)
+=item $raps2->cmd_get($name)
 
 Puts the password saved in $name into the X clipboard.
 
@@ -294,7 +293,7 @@ sub cmd_get {
 		confess('Password file does not exist');
 	}
 
-	my %key = file_to_hash($pwfile);
+	my %key = $self->file_to_hash($pwfile);
 
 	$self->get_master_password();
 
@@ -307,7 +306,7 @@ sub cmd_get {
 	}
 }
 
-=head2 ->cmd_info($name)
+=item $raps2->cmd_info($name)
 
 Prints unencrypted information about $name.
 
@@ -321,14 +320,14 @@ sub cmd_info {
 		confess('Password file does not exist');
 	}
 
-	my %key = file_to_hash($pwfile);
+	my %key = $self->file_to_hash($pwfile);
 	$self->ui()->output(
 		['URL', $key{'url'}],
 		['Login', $key{'login'}],
 	);
 }
 
-=head2 ->cmd_list()
+=item $raps2->cmd_list()
 
 Lists all saved passwords and their logins and urls
 
@@ -338,7 +337,7 @@ sub cmd_list {
 	my ($self) = @_;
 
 	for my $file (read_dir($self->{xdg_data})) {
-		my %key = file_to_hash($self->{xdg_data} . "/${file}");
+		my %key = $self->file_to_hash($self->{xdg_data} . "/${file}");
 		$self->ui->list(
 			['Account', $file],
 			['Login', $key{login}],
@@ -346,3 +345,15 @@ sub cmd_list {
 		);
 	}
 }
+
+=head1 DEPENDENCIES
+
+L<App::Raps2::Password>, L<App::Raps2::UI>, L<File::BaseDir>, L<File::Slurp>.
+
+=head1 AUTHOR
+
+Copyright (C) 2011 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
