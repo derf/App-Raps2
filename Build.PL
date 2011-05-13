@@ -22,7 +22,7 @@ my $build = Module::Build->new(
 		'Crypt::Eksblowfish' => 0,
 		'Crypt::Eksblowfish::Bcrypt' => 0,
 		'File::BaseDir' => 0,
-		'File::Path' => 0,
+		'File::Path' => 2.06_05,
 		'File::Slurp' => 0,
 		'POSIX' => 0,
 	},
