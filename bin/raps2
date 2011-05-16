@@ -19,6 +19,7 @@ $raps2->load_config();
 
 given ($action) {
 	when ('add')  { $raps2->cmd_add(@args) }
+	when ('del')  { $raps2->cmd_remove(@args) }
 	when ('dump') { $raps2->cmd_dump(@args) }
 	when ('get')  { $raps2->cmd_get(@args) }
 	when ('info') { $raps2->cmd_info(@args) }
@@ -58,6 +59,10 @@ the first time.
 Adds I<account> to the store.  It will ask you for the store's master
 password, some metadata and the new password and then store them.  Note that
 only the password is encrypted, the metadata is saved as clear-text.
+
+=item B<del> I<account>
+
+Remove I<account> from the store.
 
 =item B<dump> I<account>
 

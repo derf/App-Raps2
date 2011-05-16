@@ -346,6 +346,24 @@ sub cmd_list {
 	}
 }
 
+=item $raps2->cmd_remove(I<$name>)
+
+Remove (unlink) the account I<name>.
+
+=cut
+
+sub cmd_remove {
+	my ($self, $name) = @_;
+	my $pwfile = $self->{xdg_data} . "/${name}";
+
+	if (-e $pwfile) {
+		unlink($pwfile);
+	}
+	else {
+		say STDERR 'File did not exist, so could not be removed';
+	}
+}
+
 =back
 
 =head1 DEPENDENCIES
