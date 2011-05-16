@@ -7,12 +7,14 @@ use 5.010;
 
 use Carp qw(confess);
 use POSIX;
+use Term::ReadLine;
 
 our $VERSION = '0.2';
 
 sub new {
 	my ($obj) = @_;
 	my $ref = {};
+	$ref->{term_readline} = Term::ReadLine->new('App::Raps2');
 	return bless($ref, $obj);
 }
 
@@ -28,12 +30,12 @@ sub list {
 }
 
 sub read_line {
-	my ($self, $str) = @_;
+	my ($self, $str, $pre) = @_;
 
-	print "${str}: ";
-	my $input = readline(STDIN);
+	$pre //= q{};
 
-	chomp $input;
+	my $input = $self->{term_readline}->readline("${str}: ${pre}");
+
 	return $input;
 }
 
@@ -43,8 +45,8 @@ sub read_multiline {
 
 	say "${str} (^D to quit)";
 
-	while (my $line = <STDIN>) {
-		$in .= $line;
+	while (my $line = $self->read_line('multiline')) {
+		$in .= "${line}\n";
 	}
 	return $in;
 }

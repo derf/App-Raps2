@@ -24,6 +24,7 @@ my $build = Module::Build->new(
 		'File::Path' => 2.06_05,
 		'File::Slurp' => 0,
 		'POSIX' => 0,
+		'Term::ReadLine' => 0,
 	},
 	script_files => 'bin/',
 	sign => 1,

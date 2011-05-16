@@ -224,11 +224,11 @@ sub cmd_add {
 
 	$self->get_master_password();
 
-	my $salt = $self->create_salt();
-	my $url = $self->ui()->read_line('URL');
-	my $login = $self->ui()->read_line('Login');
-	my $pass = $self->ui()->read_pw('Password', 1);
-	my $extra = $self->ui()->read_multiline('Additional content');
+	my $salt  = $self->create_salt();
+	my $url   = $self->ui->read_line('URL');
+	my $login = $self->ui->read_line('Login');
+	my $pass  = $self->ui->read_pw('Password', 1);
+	my $extra = $self->ui->read_multiline('Additional content');
 
 	$self->{pass}->salt($salt);
 	my $pass_hash = $self->{pass}->encrypt($pass);

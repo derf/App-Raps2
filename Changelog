@@ -1,3 +1,7 @@
+git HEAD
+
+    * Terminal input is now read via Term::ReadLine (included in perl core)
+
 raps2 0.2 - Fri May 13 2011
 
     * Fix XDG_CONFIG_HOME / XDG_DATA_HOME handling bug. Adds new dependency
