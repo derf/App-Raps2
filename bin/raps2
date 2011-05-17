@@ -21,6 +21,7 @@ given ($action) {
 	when ('add')  { $raps2->cmd_add(@args) }
 	when ('del')  { $raps2->cmd_remove(@args) }
 	when ('dump') { $raps2->cmd_dump(@args) }
+	when ('edit') { $raps2->cmd_edit(@args) }
 	when ('get')  { $raps2->cmd_get(@args) }
 	when ('info') { $raps2->cmd_info(@args) }
 	when ('list') { $raps2->cmd_list(@args) }
@@ -50,6 +51,9 @@ accountname >> and paste the corresponding password into whatever application
 requires it.  B<raps2> will automatically initialize its store when used for
 the first time.
 
+Supported metadata are "URL", "Login" and the multiline "Extra" field.  URL
+and Login will be saved as plaintext, Extra is encrypted like the password.
+
 =head1 ACTIONS
 
 =over
@@ -68,6 +72,11 @@ Remove I<account> from the store.
 
 Dump everything saved for I<account>, including the clear-text password, to
 stdout.
+
+=item B<edit> I<account>
+
+Edit saved data for I<account>.  Note that editing the multiline "extra" field
+is not yet possible.
 
 =item B<get> I<account>
 

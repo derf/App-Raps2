@@ -32,9 +32,7 @@ sub list {
 sub read_line {
 	my ($self, $str, $pre) = @_;
 
-	$pre //= q{};
-
-	my $input = $self->{term_readline}->readline("${str}: ${pre}");
+	my $input = $self->{term_readline}->readline("${str}: ", $pre);
 
 	return $input;
 }

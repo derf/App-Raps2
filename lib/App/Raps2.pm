@@ -197,6 +197,17 @@ sub load_config {
 	$self->{default}->{cost} //= $cfg{cost};
 }
 
+=item $raps2->pw()
+
+Returns the App::Raps2::Password(3pm) object.
+
+=cut
+
+sub pw {
+	my ($self) = @_;
+	return $self->{pass};
+}
+
 =item $raps2->ui()
 
 Returns the App::Raps2::UI(3pm) object.
@@ -230,11 +241,11 @@ sub cmd_add {
 	my $pass  = $self->ui->read_pw('Password', 1);
 	my $extra = $self->ui->read_multiline('Additional content');
 
-	$self->{pass}->salt($salt);
-	my $pass_hash = $self->{pass}->encrypt($pass);
+	$self->pw->salt($salt);
+	my $pass_hash = $self->pw->encrypt($pass);
 	my $extra_hash = (
 		$extra ?
-		$self->{pass}->encrypt($extra) :
+		$self->pw->encrypt($extra) :
 		q{}
 	);
 
@@ -249,9 +260,9 @@ sub cmd_add {
 	);
 }
 
-=item $raps2->cmd_dump(I<$name>)
+=item $raps2->cmd_dump(I<$account>)
 
-Dumps the content of $name.
+Dumps the content of I<account>
 
 =cut
 
@@ -267,16 +278,59 @@ sub cmd_dump {
 
 	$self->get_master_password();
 
-	$self->{pass}->salt($key{salt});
+	$self->pw->salt($key{salt});
 
 	$self->ui()->output(
 		['URL', $key{url}],
 		['Login', $key{login}],
-		['Password', $self->{pass}->decrypt($key{hash})],
+		['Password', $self->pw->decrypt($key{hash})],
 	);
 	if ($key{extra}) {
-		print $self->{pass}->decrypt($key{extra});
+		print $self->pw->decrypt($key{extra});
 	}
+}
+
+=item $raps2->cmd_edit(I<$acount>)
+
+Edit I<account>.
+
+=cut
+
+sub cmd_edit {
+	my ($self, $name) = @_;
+	my $pwfile = $self->{xdg_data} . "/${name}";
+	my $pass_hash;
+
+	if (not -e $pwfile) {
+		confess('Password file does not exist');
+	}
+
+	my %key = $self->file_to_hash($pwfile);
+
+	$self->get_master_password();
+	$self->pw->salt($key{salt});
+
+	my $salt = $key{salt};
+	my $url   = $self->ui->read_line('URL', $key{url});
+	my $login = $self->ui->read_line('Login', $key{login});
+	my $pass  = $self->ui->read_pw('New password (empty to keep old)', 1);
+	my $extra = $key{extra} // q{};
+
+	if (length($pass)) {
+		$pass_hash = $self->pw->encrypt($pass);
+	}
+	else {
+		$pass_hash = $key{hash};
+	}
+
+	write_file(
+		$pwfile,
+		"url ${url}\n",
+		"login ${login}\n",
+		"salt ${salt}\n",
+		"hash ${pass_hash}\n",
+		"extra ${extra}\n",
+	);
 }
 
 =item $raps2->cmd_get(I<$name>)
@@ -297,12 +351,12 @@ sub cmd_get {
 
 	$self->get_master_password();
 
-	$self->{pass}->salt($key{salt});
+	$self->pw->salt($key{salt});
 
-	$self->ui()->to_clipboard($self->{pass}->decrypt($key{hash}));
+	$self->ui()->to_clipboard($self->pw->decrypt($key{hash}));
 
 	if ($key{extra}) {
-		print $self->{pass}->decrypt($key{extra})
+		print $self->pw->decrypt($key{extra})
 	}
 }
 

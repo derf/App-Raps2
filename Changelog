@@ -1,6 +1,7 @@
 git HEAD
 
     * Terminal input is now read via Term::ReadLine (included in perl core)
+    * New commands: "raps2 del <account>" and "raps2 edit <account>"
 
 raps2 0.2 - Fri May 13 2011
 
