@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 19;
+use Test::More tests => 17;
 use Test::Fatal;
 
 my $pw;
@@ -15,14 +15,6 @@ use_ok('App::Raps2::Password');
 like(
 	exception {
 		App::Raps2::Password->new();
-	},
-	qr{incorrect salt length},
-	'new() missing salt and passphrase'
-);
-
-like(
-	exception {
-		App::Raps2::Password->new(salt => $salt);
 	},
 	qr{no passphrase given},
 	'new() missing passphrase'
@@ -37,14 +29,6 @@ like(
 	},
 	qr{no passphrase given},
 	'new() missing passphrase'
-);
-
-like(
-	exception {
-		App::Raps2::Password->new(passphrase => $pass);
-	},
-	qr{incorrect salt length},
-	'new() missing salt'
 );
 
 like(
@@ -100,13 +84,7 @@ like(
 
 ok($pw->verify($pw->crypt('truth')), 'crypt->verify okay');
 
-like(
-	exception {
-		$pw->salt();
-	},
-	qr{incorrect salt length},
-	'salt: No argument',
-);
+is($pw->salt(), $salt, 'salt() returns current salt');
 
 like(
 	exception {

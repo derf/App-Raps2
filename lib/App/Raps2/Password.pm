@@ -17,6 +17,10 @@ sub new {
 
 	$conf{cost} //= 12;
 
+	if (not defined $conf{salt}) {
+		$conf{salt} = create_salt();
+	}
+
 	if (not (defined $conf{salt} and length($conf{salt}) == 16)) {
 		confess('incorrect salt length');
 	}
@@ -30,8 +34,23 @@ sub new {
 	return bless($ref, $obj);
 }
 
+sub create_salt {
+	my ($self) = @_;
+	my $salt = q{};
+
+	for (1 .. 16) {
+		$salt .= chr(0x21 + int(rand(90)));
+	}
+
+	return $salt;
+}
+
 sub salt {
 	my ($self, $salt) = @_;
+
+	if (not defined $salt) {
+		return $self->{salt};
+	}
 
 	if (not (defined $salt and length($salt) == 16)) {
 		confess('incorrect salt length');

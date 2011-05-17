@@ -75,23 +75,6 @@ sub new {
 	return bless($ref, $obj);
 }
 
-=item $raps2->create_salt()
-
-Returns a 16-character random salt for App::Raps2::Password(3pm).
-
-=cut
-
-sub create_salt {
-	my ($self) = @_;
-	my $salt = q{};
-
-	for (1 .. 16) {
-		$salt .= chr(0x21 + int(rand(90)));
-	}
-
-	return $salt;
-}
-
 =item $raps2->file_to_hash(I<$file>)
 
 Reads $file (lines with key/value separated by whitespace) and returns a hash
@@ -145,7 +128,7 @@ Asks the user for the master passphrase.
 
 sub get_master_password {
 	my ($self) = @_;
-	my $pass = $self->ui()->read_pw('Master Password', 0);
+	my $pass = $self->ui->read_pw('Master Password', 0);
 
 	$self->{pass} = App::Raps2::Password->new(
 		cost => $self->{default}->{cost},
@@ -165,15 +148,14 @@ Creates a default config and asks the user to set a master password.
 sub create_config {
 	my ($self) = @_;
 	my $cost = 12;
-	my $salt = $self->create_salt();
-	my $pass = $self->ui()->read_pw('Master Password', 1);
+	my $pass = $self->ui->read_pw('Master Password', 1);
 
 	$self->{pass} = App::Raps2::Password->new(
 		cost => $cost,
-		salt => $salt,
 		passphrase => $pass,
 	);
-	my $hash = $self->{pass}->crypt();
+	my $hash = $self->pw->crypt();
+	my $salt = $self->pw->salt();
 
 	write_file(
 		$self->{xdg_conf} . '/password',
@@ -205,7 +187,13 @@ Returns the App::Raps2::Password(3pm) object.
 
 sub pw {
 	my ($self) = @_;
-	return $self->{pass};
+
+	if (defined $self->{pass}) {
+		return $self->{pass};
+	}
+	else {
+		confess('No App::Raps2::Password object, did you call get_master_password?');
+	}
 }
 
 =item $raps2->ui()
@@ -235,7 +223,7 @@ sub cmd_add {
 
 	$self->get_master_password();
 
-	my $salt  = $self->create_salt();
+	my $salt  = $self->pw->create_salt();
 	my $url   = $self->ui->read_line('URL');
 	my $login = $self->ui->read_line('Login');
 	my $pass  = $self->ui->read_pw('Password', 1);
