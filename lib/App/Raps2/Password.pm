@@ -21,7 +21,7 @@ sub new {
 		$conf{salt} = create_salt();
 	}
 
-	if (not (defined $conf{salt} and length($conf{salt}) == 16)) {
+	if (length($conf{salt}) != 16) {
 		confess('incorrect salt length');
 	}
 
@@ -52,7 +52,7 @@ sub salt {
 		return $self->{salt};
 	}
 
-	if (not (defined $salt and length($salt) == 16)) {
+	if (length($salt) != 16) {
 		confess('incorrect salt length');
 	}
 
