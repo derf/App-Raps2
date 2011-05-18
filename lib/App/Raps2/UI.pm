@@ -2,7 +2,6 @@ package App::Raps2::UI;
 
 use strict;
 use warnings;
-use autodie;
 use 5.010;
 
 use Carp qw(confess);

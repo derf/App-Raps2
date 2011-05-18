@@ -16,7 +16,6 @@ my $build = Module::Build->new(
 	module_name => 'App::Raps2',
 	requires => {
 		'perl' => '5.10.0',
-		'autodie' => 0,
 		'Crypt::CBC' => 0,
 		'Crypt::Eksblowfish' => 0,
 		'Crypt::Eksblowfish::Bcrypt' => 0,
