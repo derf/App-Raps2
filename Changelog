@@ -1,8 +1,8 @@
-git HEAD
+App::Raps2 0.3 - Wed May 18 2011
 
     * Terminal input is now read via Term::ReadLine (included in perl core)
     * New commands: "raps2 del <account>" and "raps2 edit <account>"
-    * Remove autodie, it caused a major performance impact
+    * Remove autodie, it caused a major performance loss
     * raps2 list now sorts by account name
 
 raps2 0.2 - Fri May 13 2011

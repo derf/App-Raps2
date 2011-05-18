@@ -8,7 +8,7 @@ use Carp qw(confess);
 use POSIX;
 use Term::ReadLine;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ App::Raps2::UI - App::Raps2 User Interface
 
 =head1 VERSION
 
-This manual documents B<App::Raps2::UI> version 0.2
+This manual documents B<App::Raps2::UI> version 0.3
 
 =head1 METHODS
 

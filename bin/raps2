@@ -11,7 +11,7 @@ use App::Raps2;
 my $raps2 = App::Raps2->new();
 my ($action, @args) = @ARGV;
 
-my $VERSION = '0.2';
+my $VERSION = '0.3';
 
 $raps2->sanity_check();
 $raps2->load_config();
@@ -39,7 +39,7 @@ B<raps2> I<action> I<args ...>
 
 =head1 VERSION
 
-This manual documents B<raps2> version 0.2
+This manual documents B<raps2> version 0.3
 
 =head1 DESCRIPTION
 
@@ -60,8 +60,7 @@ and Login will be saved as plaintext, Extra is encrypted like the password.
 =item B<add> I<account>
 
 Adds I<account> to the store.  It will ask you for the store's master
-password, some metadata and the new password and then store them.  Note that
-only the password is encrypted, the metadata is saved as clear-text.
+password, some metadata and the new password and then store them.
 
 =item B<del> I<account>
 
@@ -79,8 +78,9 @@ is not yet possible.
 
 =item B<get> I<account>
 
-Decrypt I<account>'s password and store it in the X Clipboard.  Note that it
-can only be pasted once.
+Decrypt I<account>'s password and store it in the primary X Clipboard.  Note
+that it can only be pasted once.  Prints the content of the multiline B<extra>
+field (if present) to stdout.
 
 =item B<info> I<account>
 
@@ -101,6 +101,9 @@ zero on success, non-zero otherwise.
 raps2 saves the master password hash in F<~/.config/raps2/password>.
 
 Additional encrypted passwords are stored in F<~/.local/share/raps2/>.
+
+These directories can be changed by setting the B<XDG_CONFIG_HOME> and
+B<XDG_DATA_HOME> environment variables.
 
 =head1 DEPENDENCIES
 

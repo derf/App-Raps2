@@ -9,7 +9,7 @@ use Crypt::CBC;
 use Crypt::Eksblowfish;
 use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash en_base64 de_base64);
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ App::Raps2::Password - Password class for App::Raps2
 
 =head1 VERSION
 
-This manual documents B<App::Raps2::Password> version 0.2
+This manual documents B<App::Raps2::Password> version 0.3
 
 =head1 METHODS
 
