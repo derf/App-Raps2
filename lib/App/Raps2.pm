@@ -376,8 +376,9 @@ Lists all saved passwords and their logins and urls
 
 sub cmd_list {
 	my ($self) = @_;
+	my @files = read_dir($self->{xdg_data});
 
-	for my $file (read_dir($self->{xdg_data})) {
+	for my $file (sort @files) {
 		my %key = $self->file_to_hash($self->{xdg_data} . "/${file}");
 		$self->ui->list(
 			['Account', $file],
