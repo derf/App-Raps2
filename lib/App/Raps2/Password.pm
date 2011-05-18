@@ -103,22 +103,22 @@ sub create_salt {
 
 =item $pass->salt([I<salt>])
 
-Gets/Sets the currently used salt.
+Returns the currently used salt and optionally changes it to I<salt>.
 
 =cut
 
 sub salt {
 	my ($self, $salt) = @_;
 
-	if (not defined $salt) {
-		return $self->{salt};
+	if (defined $salt) {
+		if (length($salt) != 16) {
+			confess('incorrect salt length');
+		}
+
+		$self->{salt} = $salt;
 	}
 
-	if (length($salt) != 16) {
-		confess('incorrect salt length');
-	}
-
-	$self->{salt} = $salt;
+	return $self->{salt};
 }
 
 =item $pass->encrypt(I<data>)
