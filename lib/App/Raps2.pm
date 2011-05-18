@@ -161,8 +161,7 @@ sub create_config {
 		"cost ${cost}\n",
 		"salt ${salt}\n",
 		"hash ${hash}\n",
-	)
-	or die("Could not write password file: $!\n");
+	);
 }
 
 =item $raps2->load_config()
@@ -245,8 +244,7 @@ sub cmd_add {
 		"salt ${salt}\n",
 		"hash ${pass_hash}\n",
 		"extra ${extra_hash}\n",
-	)
-	or die("Could not write $pwfile: $!\n");
+	);
 }
 
 =item $raps2->cmd_dump(I<$account>)
@@ -319,8 +317,7 @@ sub cmd_edit {
 		"salt ${salt}\n",
 		"hash ${pass_hash}\n",
 		"extra ${extra}\n",
-	)
-	or die("Could not write $pwfile: $!\n");
+	);
 }
 
 =item $raps2->cmd_get(I<$name>)
