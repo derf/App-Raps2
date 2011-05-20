@@ -1,3 +1,8 @@
+git HEAD
+
+    * Rename App::Raps2::Password's crypt method to bcrypt to avoid name
+      confusion with Perl's builtin function
+
 App::Raps2 0.3 - Wed May 18 2011
 
     * Terminal input is now read via Term::ReadLine (included in perl core)

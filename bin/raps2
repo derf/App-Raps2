@@ -9,21 +9,21 @@ use 5.010;
 use App::Raps2;
 
 my $raps2 = App::Raps2->new();
-my ($action, @args) = @ARGV;
+my ( $action, @args ) = @ARGV;
 
-my $VERSION = '0.3';
+our $VERSION = '0.3';
 
 $raps2->sanity_check();
 $raps2->load_config();
 
 given ($action) {
-	when ('add')  { $raps2->cmd_add(@args) }
-	when ('del')  { $raps2->cmd_remove(@args) }
-	when ('dump') { $raps2->cmd_dump(@args) }
-	when ('edit') { $raps2->cmd_edit(@args) }
-	when ('get')  { $raps2->cmd_get(@args) }
-	when ('info') { $raps2->cmd_info(@args) }
-	when ('list') { $raps2->cmd_list(@args) }
+	when ('add')     { $raps2->cmd_add(@args) }
+	when ('del')     { $raps2->cmd_remove(@args) }
+	when ('dump')    { $raps2->cmd_dump(@args) }
+	when ('edit')    { $raps2->cmd_edit(@args) }
+	when ('get')     { $raps2->cmd_get(@args) }
+	when ('info')    { $raps2->cmd_info(@args) }
+	when ('list')    { $raps2->cmd_list(@args) }
 	when ('version') { say "raps2 version ${VERSION}" }
 }
 
@@ -91,6 +91,10 @@ Show information about I<account>, does not require the master password.
 List all saved accounts with their respective Logins and URLs
 
 =back
+
+=head1 OPTIONS
+
+None.
 
 =head1 EXIT STATUS
 

@@ -82,7 +82,7 @@ like(
 	'verify: does not verify invalid hash'
 );
 
-ok($pw->verify($pw->crypt('truth')), 'crypt->verify okay');
+ok($pw->verify($pw->bcrypt('truth')), 'bcrypt->verify okay');
 
 is($pw->salt(), $salt, 'salt() returns current salt');
 

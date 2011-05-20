@@ -11,6 +11,103 @@ use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash en_base64 de_base64);
 
 our $VERSION = '0.3';
 
+sub new {
+	my ( $obj, %conf ) = @_;
+
+	$conf{cost} //= 12;
+
+	if ( not defined $conf{salt} ) {
+		$conf{salt} = create_salt();
+	}
+
+	if ( length( $conf{salt} ) != 16 ) {
+		confess('incorrect salt length');
+	}
+
+	if ( not( defined $conf{passphrase} and length $conf{passphrase} ) ) {
+		confess('no passphrase given');
+	}
+
+	my $ref = \%conf;
+
+	return bless( $ref, $obj );
+}
+
+sub create_salt {
+	my ($self) = @_;
+	my $salt = q{};
+
+	for ( 1 .. 16 ) {
+		$salt .= chr( 0x21 + int( rand(90) ) );
+	}
+
+	return $salt;
+}
+
+sub salt {
+	my ( $self, $salt ) = @_;
+
+	if ( defined $salt ) {
+		if ( length($salt) != 16 ) {
+			confess('incorrect salt length');
+		}
+
+		$self->{salt} = $salt;
+	}
+
+	return $self->{salt};
+}
+
+sub encrypt {
+	my ( $self, $in ) = @_;
+
+	my $eksblowfish = Crypt::Eksblowfish->new( $self->{cost}, $self->{salt},
+		$self->{passphrase}, );
+	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish );
+
+	return $cbc->encrypt_hex($in);
+}
+
+sub decrypt {
+	my ( $self, $in ) = @_;
+
+	my $eksblowfish = Crypt::Eksblowfish->new( $self->{cost}, $self->{salt},
+		$self->{passphrase}, );
+	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish );
+
+	return $cbc->decrypt_hex($in);
+}
+
+sub bcrypt {
+	my ($self) = @_;
+
+	return en_base64(
+		bcrypt_hash(
+			{
+				key_nul => 1,
+				cost    => $self->{cost},
+				salt    => $self->{salt},
+			},
+			$self->{passphrase},
+		)
+	);
+}
+
+sub verify {
+	my ( $self, $testhash ) = @_;
+
+	my $myhash = $self->bcrypt();
+
+	if ( $testhash eq $myhash ) {
+		return 1;
+	}
+	confess('Passwords did not match');
+}
+
+1;
+
+__END__
+
 =head1 NAME
 
 App::Raps2::Password - Password class for App::Raps2
@@ -23,7 +120,7 @@ App::Raps2::Password - Password class for App::Raps2
         passphrase => 'secret',
     );
 
-    my $oneway_hash = $raps2->crypt();
+    my $oneway_hash = $raps2->bcrypt();
     $raps2->verify($oneway_hash);
 
     my $twoway_hash = $raps2->encrypt('data');
@@ -33,6 +130,10 @@ App::Raps2::Password - Password class for App::Raps2
 =head1 VERSION
 
 This manual documents B<App::Raps2::Password> version 0.3
+
+=head1 DESCRIPTION
+
+App::Raps2::Pasword is a wrapper around Crypt::Eksblowfish.
 
 =head1 METHODS
 
@@ -60,124 +161,26 @@ generates its own.
 
 =back
 
-=cut
-
-sub new {
-	my ($obj, %conf) = @_;
-
-	$conf{cost} //= 12;
-
-	if (not defined $conf{salt}) {
-		$conf{salt} = create_salt();
-	}
-
-	if (length($conf{salt}) != 16) {
-		confess('incorrect salt length');
-	}
-
-	if (not (defined $conf{passphrase} and length $conf{passphrase})) {
-		confess('no passphrase given');
-	}
-
-	my $ref = \%conf;
-
-	return bless($ref, $obj);
-}
-
 =item $pass->create_salt()
 
 Returns a new 16-byte salt. Contains only printable characters.
 
-=cut
-
-sub create_salt {
-	my ($self) = @_;
-	my $salt = q{};
-
-	for (1 .. 16) {
-		$salt .= chr(0x21 + int(rand(90)));
-	}
-
-	return $salt;
-}
-
 =item $pass->salt([I<salt>])
 
 Returns the currently used salt and optionally changes it to I<salt>.
-
-=cut
-
-sub salt {
-	my ($self, $salt) = @_;
-
-	if (defined $salt) {
-		if (length($salt) != 16) {
-			confess('incorrect salt length');
-		}
-
-		$self->{salt} = $salt;
-	}
-
-	return $self->{salt};
-}
 
 =item $pass->encrypt(I<data>)
 
 Encrypts I<data> with the passphrase saved in the object, returns the
 corresponding hexadecimal hash (as string).
 
-=cut
-
-sub encrypt {
-	my ($self, $in) = @_;
-
-	my $eksblowfish = Crypt::Eksblowfish->new(
-		$self->{cost},
-		$self->{salt},
-		$self->{passphrase},
-	);
-	my $cbc = Crypt::CBC->new(-cipher => $eksblowfish);
-
-	return $cbc->encrypt_hex($in);
-}
-
 =item $pass->decrypt(I<hexstr>)
 
 Decrypts I<hexstr> (as created by B<encrypt>), returns its original content.
 
-=cut
-
-sub decrypt {
-	my ($self, $in) = @_;
-
-	my $eksblowfish = Crypt::Eksblowfish->new(
-		$self->{cost},
-		$self->{salt},
-		$self->{passphrase},
-	);
-	my $cbc = Crypt::CBC->new(-cipher => $eksblowfish);
-
-	return $cbc->decrypt_hex($in);
-}
-
-=item $pass->crypt()
+=item $pass->bcrypt()
 
 Return a base64 bcrypt hash of the password, salted with the salt.
-
-=cut
-
-sub crypt {
-	my ($self) = @_;
-
-	return en_base64(
-		bcrypt_hash({
-				key_nul => 1,
-				cost => $self->{cost},
-				salt => $self->{salt},
-			},
-			$self->{passphrase},
-	));
-}
 
 =item $pass->verify(I<hash>)
 
@@ -185,28 +188,20 @@ Verify a hash as returned by B<crypt>.
 
 Returns true if it matches, dies if it doesn't.
 
-=cut
-
-sub verify {
-	my ($self, $testhash) = @_;
-
-	my $myhash = $self->crypt();
-
-	if ($testhash eq $myhash) {
-		return 1;
-	}
-	confess('Passwords did not match');
-}
-
-1;
-
-__END__
-
 =back
+
+=head1 DIAGNOSTICS
+
+When anything goes wrong, App::Raps2::Password will use Carp(3pm)'s B<confess>
+method to die with a backtrace.
 
 =head1 DEPENDENCIES
 
-B<Crypt::CBC>, B<Crypt::Eksblowfish>.
+Crypt::CBC(3pm), Crypt::Eksblowfish(3pm).
+
+=head1 BUGS AND LIMITATIONS
+
+Unknown.
 
 =head1 SEE ALSO
 
