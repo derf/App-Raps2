@@ -3,8 +3,18 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 3;
-use Test::Fatal;
+use Test::More;
+
+eval "use Test::MockObject";
+plan skip_all => 'Test::MockObject required' if $@;
+
+plan tests => 3;
+
+my $mock = Test::MockObject->new();
+$mock->fake_module(
+	'Term::ReadLine',
+	new => sub { return bless({}, $_[0]) },
+);
 
 use_ok('App::Raps2');
 
