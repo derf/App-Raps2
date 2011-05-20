@@ -46,8 +46,7 @@ sub file_to_hash {
 sub sanity_check {
 	my ($self) = @_;
 
-	make_path( $self->{xdg_conf} );
-	make_path( $self->{xdg_data} );
+	make_path( $self->{xdg_conf}, $self->{xdg_data} );
 
 	if ( not -e $self->{xdg_conf} . '/password' ) {
 		$self->create_config();
