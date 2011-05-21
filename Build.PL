@@ -11,6 +11,7 @@ my $build = Module::Build->new(
 		'Test::MockObject' => 0,
 		'Test::More' => 0,
 		'Test::Pod' => 0,
+		'Test::Pod::Coverage' => 0,
 	},
 	license => 'unrestricted',
 	module_name => 'App::Raps2',
