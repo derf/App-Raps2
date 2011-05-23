@@ -92,12 +92,12 @@ sub to_clipboard {
 	my ( $self, $str ) = @_;
 
 	open( my $clipboard, q{|-}, 'xclip -l 1' )
-		or confess("Failed to execute xclip -l 1: $!");
+	  or confess("Failed to execute xclip -l 1: $!");
 
 	print $clipboard $str;
 
 	close($clipboard)
-		or confess("Failed to close pipe to xclip: $!");
+	  or confess("Failed to close pipe to xclip: $!");
 
 	return;
 }
