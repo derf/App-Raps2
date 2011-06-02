@@ -25,6 +25,7 @@ given ($action) {
 	when ('info')    { $raps2->cmd_info(@args) }
 	when ('list')    { $raps2->cmd_list(@args) }
 	when ('version') { say "raps2 version ${VERSION}" }
+	default          { die "Unknown action: $action\n" }
 }
 
 __END__
