@@ -123,6 +123,30 @@ sub ui {
 	return $self->{ui};
 }
 
+sub pw_add {
+	my ( $self, %data ) = @_;
+
+	$self->pw->salt( $data{salt} );
+
+	my $pass_hash  = $self->pw->encrypt( $data{password} );
+	my $extra_hash = (
+		  $data{extra}
+		? $self->pw->encrypt( $data{extra} )
+		: q{}
+	);
+
+	write_file(
+		$data{file},
+		"url $data{url}\n",
+		"login $data{login}\n",
+		"salt $data{salt}\n",
+		"hash ${pass_hash}\n",
+		"extra ${extra_hash}\n",
+	);
+
+	return;
+}
+
 sub cmd_add {
 	my ( $self, $name ) = @_;
 
@@ -140,23 +164,35 @@ sub cmd_add {
 	my $pass  = $self->ui->read_pw( 'Password', 1 );
 	my $extra = $self->ui->read_multiline('Additional content');
 
-	$self->pw->salt($salt);
-	my $pass_hash  = $self->pw->encrypt($pass);
-	my $extra_hash = (
-		  $extra
-		? $self->pw->encrypt($extra)
-		: q{}
-	);
-
-	write_file(
-		$pwfile, "url ${url}\n",
-		"login ${login}\n",
-		"salt ${salt}\n",
-		"hash ${pass_hash}\n",
-		"extra ${extra_hash}\n",
+	$self->pw_add(
+		file     => $pwfile,
+		salt     => $salt,
+		url      => $url,
+		login    => $login,
+		password => $pass,
+		extra    => $extra,
 	);
 
 	return;
+}
+
+sub pw_get {
+	my ( $self, %data ) = @_;
+
+	my %key = $self->file_to_hash( $data{file} );
+
+	$self->pw->salt( $key{salt} );
+
+	return {
+		url      => $key{url},
+		login    => $key{login},
+		password => $self->pw->decrypt( $key{hash} ),
+		extra    => (
+			  $key{extra}
+			? $self->pw->decrypt( $key{extra} )
+			: undef
+		),
+	};
 }
 
 sub cmd_dump {
@@ -168,19 +204,17 @@ sub cmd_dump {
 		confess('Password file does not exist');
 	}
 
-	my %key = $self->file_to_hash($pwfile);
-
 	$self->get_master_password();
 
-	$self->pw->salt( $key{salt} );
+	my $key = $self->pw_get( file => $pwfile );
 
 	$self->ui()->output(
-		[ 'URL',      $key{url} ],
-		[ 'Login',    $key{login} ],
-		[ 'Password', $self->pw->decrypt( $key{hash} ) ],
+		[ 'URL',      $key->{url} ],
+		[ 'Login',    $key->{login} ],
+		[ 'Password', $key->{password} ],
 	);
-	if ( $key{extra} ) {
-		print $self->pw->decrypt( $key{extra} );
+	if ( $key->{extra} ) {
+		print $key->{extra};
 	}
 
 	return;
