@@ -126,12 +126,10 @@ sub ui {
 sub pw_add {
 	my ( $self, %data ) = @_;
 
-	$self->pw->salt( $data{salt} );
-
-	my $pass_hash  = $self->pw->encrypt( $data{password} );
+	my $pass_hash = $self->pw->encrypt( $data{password}, $data{salt} );
 	my $extra_hash = (
 		  $data{extra}
-		? $self->pw->encrypt( $data{extra} )
+		? $self->pw->encrypt( $data{extra}, $data{salt} )
 		: q{}
 	);
 
@@ -181,15 +179,13 @@ sub pw_get {
 
 	my %key = $self->file_to_hash( $data{file} );
 
-	$self->pw->salt( $key{salt} );
-
 	return {
 		url      => $key{url},
 		login    => $key{login},
-		password => $self->pw->decrypt( $key{hash} ),
+		password => $self->pw->decrypt( $key{hash}, $key{salt} ),
 		extra    => (
 			  $key{extra}
-			? $self->pw->decrypt( $key{extra} )
+			? $self->pw->decrypt( $key{extra}, $key{salt} )
 			: undef
 		),
 	};
@@ -233,7 +229,6 @@ sub cmd_edit {
 	my %key = $self->file_to_hash($pwfile);
 
 	$self->get_master_password();
-	$self->pw->salt( $key{salt} );
 
 	my $salt  = $key{salt};
 	my $url   = $self->ui->read_line( 'URL', $key{url} );
@@ -242,7 +237,7 @@ sub cmd_edit {
 	my $extra = $key{extra} // q{};
 
 	if ( length($pass) ) {
-		$pass_hash = $self->pw->encrypt($pass);
+		$pass_hash = $self->pw->encrypt( $pass, $salt );
 	}
 	else {
 		$pass_hash = $key{hash};
@@ -272,12 +267,10 @@ sub cmd_get {
 
 	$self->get_master_password();
 
-	$self->pw->salt( $key{salt} );
-
-	$self->ui()->to_clipboard( $self->pw->decrypt( $key{hash} ) );
+	$self->ui()->to_clipboard( $self->pw->decrypt( $key{hash}, $key{salt} ) );
 
 	if ( $key{extra} ) {
-		print $self->pw->decrypt( $key{extra} );
+		print $self->pw->decrypt( $key{extra}, $key{salt} );
 	}
 
 	return;

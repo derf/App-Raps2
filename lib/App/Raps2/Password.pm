@@ -59,20 +59,24 @@ sub salt {
 }
 
 sub encrypt {
-	my ( $self, $in ) = @_;
+	my ( $self, $in, $salt ) = @_;
 
-	my $eksblowfish = Crypt::Eksblowfish->new( $self->{cost}, $self->{salt},
-		$self->{passphrase}, );
+	$salt //= $self->{salt};
+
+	my $eksblowfish
+	  = Crypt::Eksblowfish->new( $self->{cost}, $salt, $self->{passphrase}, );
 	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish );
 
 	return $cbc->encrypt_hex($in);
 }
 
 sub decrypt {
-	my ( $self, $in ) = @_;
+	my ( $self, $in, $salt ) = @_;
 
-	my $eksblowfish = Crypt::Eksblowfish->new( $self->{cost}, $self->{salt},
-		$self->{passphrase}, );
+	$salt //= $self->{salt};
+
+	my $eksblowfish
+	  = Crypt::Eksblowfish->new( $self->{cost}, $salt, $self->{passphrase}, );
 	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish );
 
 	return $cbc->decrypt_hex($in);
@@ -169,14 +173,20 @@ Returns a new 16-byte salt. Contains only printable characters.
 
 Returns the currently used salt and optionally changes it to I<salt>.
 
-=item $pass->encrypt(I<data>)
+=item $pass->encrypt(I<data>, [I<salt>])
 
 Encrypts I<data> with the passphrase saved in the object, returns the
 corresponding hexadecimal hash (as string).
 
-=item $pass->decrypt(I<hexstr>)
+By default, the salt set in B<salt> or B<new> will be used. You can override
+it by specifying I<salt>.
+
+=item $pass->decrypt(I<hexstr>, [I<salt>])
 
 Decrypts I<hexstr> (as created by B<encrypt>), returns its original content.
+
+By default, the salt set in B<salt> or B<new> will be used. You can override
+it by specifying I<salt>.
 
 =item $pass->bcrypt()
 
