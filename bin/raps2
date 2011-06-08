@@ -13,9 +13,6 @@ my ( $action, @args ) = @ARGV;
 
 our $VERSION = '0.3';
 
-$raps2->sanity_check();
-$raps2->load_config();
-
 given ($action) {
 	when ('add')     { $raps2->cmd_add(@args) }
 	when ('del')     { $raps2->cmd_remove(@args) }

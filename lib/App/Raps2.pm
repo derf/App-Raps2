@@ -24,7 +24,14 @@ sub new {
 
 	$ref->{default} = \%conf;
 
-	return bless( $ref, $obj );
+	bless( $ref, $obj );
+
+	if ( not $conf{dont_touch_fs} ) {
+		$ref->sanity_check();
+		$ref->load_config();
+	}
+
+	return $ref;
 }
 
 sub file_to_hash {
@@ -383,6 +390,7 @@ with its key/value pairs.
 
 Create working directories (~/.config/raps2 and ~/.local/share/raps2, or the
 respective XDG environment variable contents), if they don't exist yet.
+Automatically called by B<new>.
 
 Calls B<create_config> if no raps2 config was found.
 
@@ -396,7 +404,7 @@ Creates a default config and asks the user to set a master password.
 
 =item $raps2->load_config()
 
-Load config
+Load config. Automatically called by B<new>.
 
 =item $raps2->pw()
 
