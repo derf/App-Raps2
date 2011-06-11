@@ -133,6 +133,8 @@ sub ui {
 sub pw_add {
 	my ( $self, %data ) = @_;
 
+	$data{file} //= $self->{xdg_data} . "/$data{name}";
+
 	my $pass_hash = $self->pw->encrypt( $data{password}, $data{salt} );
 	my $extra_hash = (
 		  $data{extra}
@@ -183,6 +185,8 @@ sub cmd_add {
 
 sub pw_get {
 	my ( $self, %data ) = @_;
+
+	$data{file} //= $self->{xdg_data} . "/$data{name}";
 
 	my %key = $self->file_to_hash( $data{file} );
 
@@ -413,6 +417,19 @@ Returns the App::Raps2::Password(3pm) object.
 =item $raps2->ui()
 
 Returns the App::Raps2::UI(3pm) object.
+
+=item $raps2->pw_add(I<%data>)
+
+Write an account as specified by I<data> to the store. Requires
+B<get_master_password> to have been called before. Requires I<data> keys are
+password, salt and either file or name, plus the optional url, login and
+extra.
+
+=item $raps2->pw_get(B<file> => I<file> | B<name> => I<name>)
+
+Loads a password from I<file> (or account I<name>), requires
+B<get_master_password> to have been called before. Returns a hashref
+containing its url, login and decrypted password and extra.
 
 =item $raps2->cmd_add(I<$name>)
 
