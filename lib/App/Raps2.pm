@@ -390,6 +390,47 @@ B<cost> of key setup, passed on to App::Raps2::Password(3pm).
 Reads $file (lines with key/value separated by whitespace) and returns a hash
 with its key/value pairs.
 
+=item $raps2->get_master_password()
+
+Asks the user for the master passphrase.
+
+=item $raps2->pw_add(I<%data>)
+
+Write an account as specified by I<data> to the store. Requires
+B<get_master_password> to have been called before.
+
+The following I<data> keys are possible:
+
+=over
+
+=item B<password> => I<password to encrypt> (mandatory)
+
+=item B<salt> => I<salt> (mandatory)
+
+=item B<file> => I<file> | B<name> => I<name> (one must be set)
+
+=item B<url> => I<url> (optional)
+
+=item B<login> => I<login> (optional)
+
+=item B<extra> => I<extra> (optiona)
+
+=back
+
+=item $raps2->pw_get(B<file> => I<file> | B<name> => I<name>)
+
+Loads a password from I<file> (or account I<name>), requires
+B<get_master_password> to have been called before. Returns a hashref
+containing its url, login and decrypted password and extra.
+
+=back
+
+=head2 INTERNAL
+
+You usually don't need to call these methods by yourself.
+
+=over
+
 =item $raps2->sanity_check()
 
 Create working directories (~/.config/raps2 and ~/.local/share/raps2, or the
@@ -397,10 +438,6 @@ respective XDG environment variable contents), if they don't exist yet.
 Automatically called by B<new>.
 
 Calls B<create_config> if no raps2 config was found.
-
-=item $raps2->get_master_password()
-
-Asks the user for the master passphrase.
 
 =item $raps2->create_config()
 
@@ -417,19 +454,6 @@ Returns the App::Raps2::Password(3pm) object.
 =item $raps2->ui()
 
 Returns the App::Raps2::UI(3pm) object.
-
-=item $raps2->pw_add(I<%data>)
-
-Write an account as specified by I<data> to the store. Requires
-B<get_master_password> to have been called before. Requires I<data> keys are
-password, salt and either file or name, plus the optional url, login and
-extra.
-
-=item $raps2->pw_get(B<file> => I<file> | B<name> => I<name>)
-
-Loads a password from I<file> (or account I<name>), requires
-B<get_master_password> to have been called before. Returns a hashref
-containing its url, login and decrypted password and extra.
 
 =item $raps2->cmd_add(I<$name>)
 
