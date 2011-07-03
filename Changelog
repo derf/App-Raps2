@@ -2,6 +2,12 @@ git HEAD
 
     * Rename App::Raps2::Password's crypt method to bcrypt to avoid name
       confusion with Perl's builtin function
+    * Add pw_add / pw_get methods
+    * Accept salt parameter in App::Raps2::Password encrypt/decrypt
+    * Mock Term::ReadLine to make tests run without tty
+    * Automatically run sanity_check and load_config when creating a new
+      App::Raps2 object
+    * raps2: Print error message when an invalid action is specified
 
 App::Raps2 0.3 - Wed May 18 2011
 
