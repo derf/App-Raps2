@@ -11,7 +11,7 @@ use App::Raps2;
 my $raps2 = App::Raps2->new();
 my ( $action, @args ) = @ARGV;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 given ($action) {
 	when ('add')     { $raps2->cmd_add(@args) }
@@ -37,7 +37,7 @@ B<raps2> I<action> I<args ...>
 
 =head1 VERSION
 
-This manual documents B<raps2> version 0.3
+This manual documents B<raps2> version 0.4
 
 =head1 DESCRIPTION
 
