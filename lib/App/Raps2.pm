@@ -497,7 +497,7 @@ File::Slurp(3pm).
 
 =head1 BUGS AND LIMITATIONS
 
-Unknown.
+Be aware that the password handling API is not yet stable.
 
 =head1 AUTHOR
 
