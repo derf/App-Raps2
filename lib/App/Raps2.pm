@@ -141,8 +141,10 @@ sub ui {
 sub pw_save {
 	my ( $self, %data ) = @_;
 
-	$data{file} //= $self->{xdg_data} . "/$data{name}";
-	$data{salt} //= $self->pw->create_salt();
+	$data{file}  //= $self->{xdg_data} . "/$data{name}";
+	$data{login} //= q{};
+	$data{salt}  //= $self->pw->create_salt();
+	$data{url}   //= q{};
 
 	my $pass_hash = $self->pw->encrypt( $data{password}, $data{salt} );
 	my $extra_hash = (
