@@ -17,7 +17,7 @@ sub new {
 	my ( $class, %opt ) = @_;
 	my $self = {};
 
-	$self->{xdg_opt}  = config_home('raps2');
+	$self->{xdg_conf} = config_home('raps2');
 	$self->{xdg_data} = data_home('raps2');
 
 	$self->{ui} = App::Raps2::UI->new();
@@ -28,7 +28,7 @@ sub new {
 
 	if ( not $opt{dont_touch_fs} ) {
 		$self->sanity_check();
-		$self->load_optig();
+		$self->load_config();
 	}
 
 	if ( $opt{master_password} ) {
@@ -74,7 +74,7 @@ sub get_master_password {
 	}
 
 	$self->{pass} = App::Raps2::Password->new(
-		cost       => $self->{default}->{cost},
+		cost       => $self->{default}{cost},
 		salt       => $self->{master_salt},
 		passphrase => $pass,
 	);
@@ -86,8 +86,9 @@ sub get_master_password {
 
 sub create_config {
 	my ($self) = @_;
-	my $cost = 12;
-	my $pass = $self->ui->read_pw( 'Master Password', 1 );
+	my $cost   = 12;
+	my $pass   = $self->{default}{master_password}
+	  // $self->ui->read_pw( 'Master Password', 1 );
 
 	$self->{pass} = App::Raps2::Password->new(
 		cost       => $cost,
@@ -111,7 +112,7 @@ sub load_config {
 	my $cfg = $self->file_to_hash( $self->{xdg_conf} . '/password' );
 	$self->{master_hash} = $cfg->{hash};
 	$self->{master_salt} = $cfg->{salt};
-	$self->{default}->{cost} //= $cfg->{cost};
+	$self->{default}{cost} //= $cfg->{cost};
 
 	return;
 }
