@@ -5,6 +5,7 @@ git HEAD
     * Rename pw_add t pw_save
     * Rename pw_get to pw_load
     * pw_load now also returns the salt
+    * file_to_hash now returns a hashref instead of a hash
 
 App::Raps2 0.4 - Sun Jul 03 2011
 

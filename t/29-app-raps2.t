@@ -24,7 +24,7 @@ isa_ok($r2, 'App::Raps2');
 isa_ok($r2->ui(), 'App::Raps2::UI');
 
 is_deeply(
-	{ $r2->file_to_hash('t/in/hash') },
+	$r2->file_to_hash('t/in/hash'),
 	{ key => 'value', otherkey => 'othervalue' },
 	'file_to_hash works',
 );

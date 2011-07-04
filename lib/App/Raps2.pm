@@ -36,7 +36,7 @@ sub new {
 
 sub file_to_hash {
 	my ( $self, $file ) = @_;
-	my %ret;
+	my $ret;
 
 	for my $line ( slurp($file) ) {
 		my ( $key, $value ) = split( qr{ \s+ }x, $line );
@@ -45,9 +45,9 @@ sub file_to_hash {
 			next;
 		}
 
-		$ret{$key} = $value;
+		$ret->{$key} = $value;
 	}
-	return %ret;
+	return $ret;
 }
 
 sub sanity_check {
@@ -101,10 +101,10 @@ sub create_config {
 
 sub load_config {
 	my ($self) = @_;
-	my %cfg = $self->file_to_hash( $self->{xdg_conf} . '/password' );
-	$self->{master_hash} = $cfg{hash};
-	$self->{master_salt} = $cfg{salt};
-	$self->{default}->{cost} //= $cfg{cost};
+	my $cfg = $self->file_to_hash( $self->{xdg_conf} . '/password' );
+	$self->{master_hash} = $cfg->{hash};
+	$self->{master_salt} = $cfg->{salt};
+	$self->{default}->{cost} //= $cfg->{cost};
 
 	return;
 }
@@ -159,16 +159,16 @@ sub pw_load {
 
 	$data{file} //= $self->{xdg_data} . "/$data{name}";
 
-	my %key = $self->file_to_hash( $data{file} );
+	my $key = $self->file_to_hash( $data{file} );
 
 	return {
-		url      => $key{url},
-		login    => $key{login},
-		password => $self->pw->decrypt( $key{hash}, $key{salt} ),
-		salt     => $key{salt},
+		url      => $key->{url},
+		login    => $key->{login},
+		password => $self->pw->decrypt( $key->{hash}, $key->{salt} ),
+		salt     => $key->{salt},
 		extra    => (
-			  $key{extra}
-			? $self->pw->decrypt( $key{extra}, $key{salt} )
+			  $key->{extra}
+			? $self->pw->decrypt( $key->{extra}, $key->{salt} )
 			: undef
 		),
 	};
@@ -216,8 +216,8 @@ B<cost> of key setup, passed on to App::Raps2::Password(3pm).
 
 =item $raps2->file_to_hash(I<$file>)
 
-Reads $file (lines with key/value separated by whitespace) and returns a hash
-with its key/value pairs.
+Reads $file (lines with key/value separated by whitespace) and returns a
+hashref with its key/value pairs.
 
 =item $raps2->get_master_password()
 
