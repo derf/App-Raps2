@@ -137,6 +137,7 @@ sub pw_save {
 	my ( $self, %data ) = @_;
 
 	$data{file} //= $self->{xdg_data} . "/$data{name}";
+	$data{salt} //= $self->pw->create_salt();
 
 	my $pass_hash = $self->pw->encrypt( $data{password}, $data{salt} );
 	my $extra_hash = (
@@ -236,29 +237,6 @@ B<cost> of key setup, passed on to App::Raps2::Password(3pm).
 Sets the master password used to encrypt all accounts. Uses I<password> if
 specified, otherwise it asks the user via App::Raps2::UI(3pm).
 
-=item $raps2->pw_save( I<%data> )
-
-Write an account as specified by I<data> to the store. Requires
-B<get_master_password> to have been called before.
-
-The following I<data> keys are supported:
-
-=over
-
-=item B<password> => I<password to encrypt> (mandatory)
-
-=item B<salt> => I<salt> (mandatory)
-
-=item B<file> => I<file> | B<name> => I<name> (one must be set)
-
-=item B<url> => I<url> (optional)
-
-=item B<login> => I<login> (optional)
-
-=item B<extra> => I<extra> (optiona)
-
-=back
-
 =item $raps2->pw_load( B<file> => I<file> | B<name> => I<name> )
 
 Load a password from I<file> (or account I<name>), requires
@@ -275,6 +253,33 @@ B<get_master_password>.
 
 Returns a hashref with url, login and salt.
 
+=item $raps2->pw_save( I<%data> )
+
+Write an account as specified by I<data> to the store. Requires
+B<get_master_password> to have been called before.
+
+The following I<data> keys are supported:
+
+=over
+
+=item B<password> => I<password to encrypt> (mandatory)
+
+=item B<salt> => I<salt>
+
+=item B<file> => I<file> | B<name> => I<name> (one must be set)
+
+=item B<url> => I<url> (optional)
+
+=item B<login> => I<login> (optional)
+
+=item B<extra> => I<extra> (optiona)
+
+=back
+
+=item $raps2->ui()
+
+Returns the App::Raps2::UI(3pm) object.
+
 =back
 
 =head2 INTERNAL
@@ -282,14 +287,6 @@ Returns a hashref with url, login and salt.
 You usually don't need to call these methods by yourself.
 
 =over
-
-=item $raps2->sanity_check()
-
-Create working directories (~/.config/raps2 and ~/.local/share/raps2, or the
-respective XDG environment variable contents), if they don't exist yet.
-Automatically called by B<new>.
-
-Calls B<create_config> if no raps2 config was found.
 
 =item $raps2->create_config()
 
@@ -303,14 +300,18 @@ Load config. Automatically called by B<new>.
 
 Returns the App::Raps2::Password(3pm) object.
 
-=item $raps2->ui()
-
-Returns the App::Raps2::UI(3pm) object.
-
 =item $raps2->file_to_hash( I<$file> )
 
 Reads $file (lines with key/value separated by whitespace) and returns a
 hashref with its key/value pairs.
+
+=item $raps2->sanity_check()
+
+Create working directories (~/.config/raps2 and ~/.local/share/raps2, or the
+respective XDG environment variable contents), if they don't exist yet.
+Automatically called by B<new>.
+
+Calls B<create_config> if no raps2 config was found.
 
 =back
 

@@ -27,7 +27,6 @@ sub cmd_add {
 
 	$raps2->get_master_password();
 
-	my $salt  = $raps2->pw->create_salt();
 	my $url   = $raps2->ui->read_line('URL');
 	my $login = $raps2->ui->read_line('Login');
 	my $pass  = $raps2->ui->read_pw( 'Password', 1 );
@@ -35,7 +34,6 @@ sub cmd_add {
 
 	$raps2->pw_save(
 		file     => $pwfile,
-		salt     => $salt,
 		url      => $url,
 		login    => $login,
 		password => $pass,
