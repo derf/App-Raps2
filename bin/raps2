@@ -7,22 +7,186 @@ use warnings;
 use 5.010;
 
 use App::Raps2;
+use File::BaseDir qw(data_files data_home);
+use File::Slurp qw(read_dir);
 
 my $raps2 = App::Raps2->new();
 my ( $action, @args ) = @ARGV;
 
 our $VERSION = '0.4';
 
+sub cmd_add {
+	my ($name) = @_;
+
+	my $pwfile = data_home('raps2') . "/${name}";
+
+	if ( -e $pwfile ) {
+		say STDERR "Account already exists: ${name}";
+		exit 2;
+	}
+
+	$raps2->get_master_password();
+
+	my $salt  = $raps2->pw->create_salt();
+	my $url   = $raps2->ui->read_line('URL');
+	my $login = $raps2->ui->read_line('Login');
+	my $pass  = $raps2->ui->read_pw( 'Password', 1 );
+	my $extra = $raps2->ui->read_multiline('Additional content');
+
+	$raps2->pw_save(
+		file     => $pwfile,
+		salt     => $salt,
+		url      => $url,
+		login    => $login,
+		password => $pass,
+		extra    => $extra,
+	);
+
+	return;
+}
+
+sub cmd_dump {
+	my ($name) = @_;
+
+	my $pwfile = data_files("raps2/${name}");
+
+	if ( not defined $pwfile ) {
+		say STDERR "Account does not exist: ${name}";
+		exit 2;
+	}
+
+	$raps2->get_master_password();
+
+	my $key = $raps2->pw_load( file => $pwfile );
+
+	$raps2->ui->output(
+		[ 'URL',      $key->{url} ],
+		[ 'Login',    $key->{login} ],
+		[ 'Password', $key->{password} ],
+	);
+	if ( $key->{extra} ) {
+		print $key->{extra};
+	}
+
+	return;
+}
+
+sub cmd_edit {
+	my ($name) = @_;
+
+	my $pwfile = data_files("raps2/${name}");
+
+	if ( not defined $pwfile ) {
+		say STDERR "Account does not exist: ${name}";
+		exit 2;
+	}
+
+	$raps2->get_master_password();
+
+	my $key = $raps2->pw_load( file => $pwfile );
+
+	my $salt     = $key->{salt};
+	my $url      = $raps2->ui->read_line( 'URL', $key->{url} );
+	my $login    = $raps2->ui->read_line( 'Login', $key->{login} );
+	my $pass     = $key->{password};
+	my $new_pass = $raps2->ui->read_pw( 'New password (empty to keep old)', 1 );
+	my $extra    = $key->{extra} // q{};
+
+	if ( length($new_pass) ) {
+		$pass = $new_pass;
+	}
+
+	$raps2->pw_save(
+		file     => $pwfile,
+		salt     => $salt,
+		url      => $url,
+		login    => $login,
+		password => $pass,
+		extra    => $extra,
+	);
+
+	return;
+}
+
+sub cmd_get {
+	my ($name) = @_;
+
+	my $pwfile = data_files("raps2/${name}");
+
+	if ( not defined $pwfile ) {
+		say STDERR "Account does not exist: ${name}";
+		exit 2;
+	}
+
+	$raps2->get_master_password();
+
+	my $key = $raps2->pw_load( file => $pwfile );
+
+	$raps2->ui->to_clipboard( $key->{password} );
+
+	if ( $key->{extra} ) {
+		print $key->{extra};
+	}
+
+	return;
+}
+
+sub cmd_info {
+	my ($name) = @_;
+
+	my $pwfile = data_files("raps2/${name}");
+
+	if ( not defined $pwfile ) {
+		say STDERR "Account does not exist: ${name}";
+		exit 2;
+	}
+
+	my %key = $raps2->file_to_hash($pwfile);
+	$raps2->ui->output( [ 'URL', $key{url} ], [ 'Login', $key{login} ], );
+
+	return;
+}
+
+sub cmd_list {
+	my @files = read_dir( data_home('raps2') );
+
+	for my $file ( sort @files ) {
+		my %key = $raps2->file_to_hash( data_files("raps2/${file}") );
+		$raps2->ui->list(
+			[ 'Account', $file ],
+			[ 'Login',   $key{login} ],
+			[ 'URL',     $key{url} ],
+		);
+	}
+
+	return;
+}
+
+sub cmd_remove {
+	my ($name) = @_;
+
+	my $pwfile = data_files("raps2/${name}");
+
+	if ( defined $pwfile ) {
+		unlink($pwfile);
+	}
+	else {
+		say STDERR "Account did not exist: ${name}";
+	}
+
+	return;
+}
+
 given ($action) {
-	when ('add')     { $raps2->cmd_add(@args) }
-	when ('del')     { $raps2->cmd_remove(@args) }
-	when ('dump')    { $raps2->cmd_dump(@args) }
-	when ('edit')    { $raps2->cmd_edit(@args) }
-	when ('get')     { $raps2->cmd_get(@args) }
-	when ('info')    { $raps2->cmd_info(@args) }
-	when ('list')    { $raps2->cmd_list(@args) }
+	when ('add')     { cmd_add(@args) }
+	when ('del')     { cmd_remove(@args) }
+	when ('dump')    { cmd_dump(@args) }
+	when ('edit')    { cmd_edit(@args) }
+	when ('get')     { cmd_get(@args) }
+	when ('info')    { cmd_info(@args) }
+	when ('list')    { cmd_list(@args) }
 	when ('version') { say "raps2 version ${VERSION}" }
-	default          { die "Unknown action: $action\n" }
+	default          { die "Unknown action: ${action}\n" }
 }
 
 __END__

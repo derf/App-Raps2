@@ -1,3 +1,11 @@
+git HEAD
+
+    [App::Raps2]
+    * Move cmd_* functions into raps2
+    * Rename pw_add t pw_save
+    * Rename pw_get to pw_load
+    * pw_load now also returns the salt
+
 App::Raps2 0.4 - Sun Jul 03 2011
 
     * Rename App::Raps2::Password's crypt method to bcrypt to avoid name
