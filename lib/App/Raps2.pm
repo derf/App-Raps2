@@ -14,24 +14,28 @@ use File::Slurp qw(slurp write_file);
 our $VERSION = '0.4';
 
 sub new {
-	my ( $obj, %conf ) = @_;
-	my $ref = {};
+	my ( $class, %opt ) = @_;
+	my $self = {};
 
-	$ref->{xdg_conf} = config_home('raps2');
-	$ref->{xdg_data} = data_home('raps2');
+	$self->{xdg_opt}  = config_home('raps2');
+	$self->{xdg_data} = data_home('raps2');
 
-	$ref->{ui} = App::Raps2::UI->new();
+	$self->{ui} = App::Raps2::UI->new();
 
-	$ref->{default} = \%conf;
+	$self->{default} = \%opt;
 
-	bless( $ref, $obj );
+	bless( $self, $class );
 
-	if ( not $conf{dont_touch_fs} ) {
-		$ref->sanity_check();
-		$ref->load_config();
+	if ( not $opt{dont_touch_fs} ) {
+		$self->sanity_check();
+		$self->load_optig();
 	}
 
-	return $ref;
+	if ( $opt{master_password} ) {
+		$self->get_master_password( $opt{master_password} );
+	}
+
+	return $self;
 }
 
 sub file_to_hash {
