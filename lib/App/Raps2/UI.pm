@@ -47,7 +47,7 @@ sub read_multiline {
 
 	my $in;
 
-	say "${str} (^D to quit)";
+	say "${str} (^D or empty line to quit)";
 
 	while ( my $line = $self->read_line('multiline') ) {
 		$in .= "${line}\n";
