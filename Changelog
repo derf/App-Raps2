@@ -6,6 +6,7 @@ git HEAD
     * Rename pw_get to pw_load
     * pw_load now also returns the salt
     * file_to_hash now returns a hashref instead of a hash
+    * Allow password to be passed as argument to get_master_password
 
 App::Raps2 0.4 - Sun Jul 03 2011
 

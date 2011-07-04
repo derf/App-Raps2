@@ -63,8 +63,11 @@ sub sanity_check {
 }
 
 sub get_master_password {
-	my ($self) = @_;
-	my $pass = $self->ui->read_pw( 'Master Password', 0 );
+	my ( $self, $pass ) = @_;
+
+	if ( not defined $pass ) {
+		$pass = $self->ui->read_pw( 'Master Password', 0 );
+	}
 
 	$self->{pass} = App::Raps2::Password->new(
 		cost       => $self->{default}->{cost},
@@ -219,16 +222,17 @@ B<cost> of key setup, passed on to App::Raps2::Password(3pm).
 Reads $file (lines with key/value separated by whitespace) and returns a
 hashref with its key/value pairs.
 
-=item $raps2->get_master_password()
+=item $raps2->get_master_password([I<$password>])
 
-Asks the user for the master passphrase.
+Sets the master password used to encrypt all accounts. Uses I<password> if
+specified, otherwise it asks the user via App::Raps2::UI(3pm).
 
 =item $raps2->pw_save(I<%data>)
 
 Write an account as specified by I<data> to the store. Requires
 B<get_master_password> to have been called before.
 
-The following I<data> keys are possible:
+The following I<data> keys are supported:
 
 =over
 
