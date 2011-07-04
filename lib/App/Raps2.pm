@@ -177,6 +177,20 @@ sub pw_load {
 	};
 }
 
+sub pw_load_info {
+	my ( $self, %data ) = @_;
+
+	$data{file} //= $self->{xdg_data} . "/$data{name}";
+
+	my $key = $self->file_to_hash( $data{file} );
+
+	return {
+		url   => $key->{url},
+		login => $key->{login},
+		salt  => $key->{salt},
+	};
+}
+
 1;
 
 __END__
@@ -203,7 +217,7 @@ This manual documents App::Raps2 version 0.4
 
 =over
 
-=item $raps2 = App::Raps2->new(I<%conf>)
+=item $raps2 = App::Raps2->new( I<%conf> )
 
 Returns a new B<App::Raps2> object.
 
@@ -217,17 +231,12 @@ B<cost> of key setup, passed on to App::Raps2::Password(3pm).
 
 =back
 
-=item $raps2->file_to_hash(I<$file>)
-
-Reads $file (lines with key/value separated by whitespace) and returns a
-hashref with its key/value pairs.
-
-=item $raps2->get_master_password([I<$password>])
+=item $raps2->get_master_password( [I<$password>] )
 
 Sets the master password used to encrypt all accounts. Uses I<password> if
 specified, otherwise it asks the user via App::Raps2::UI(3pm).
 
-=item $raps2->pw_save(I<%data>)
+=item $raps2->pw_save( I<%data> )
 
 Write an account as specified by I<data> to the store. Requires
 B<get_master_password> to have been called before.
@@ -250,11 +259,21 @@ The following I<data> keys are supported:
 
 =back
 
-=item $raps2->pw_load(B<file> => I<file> | B<name> => I<name>)
+=item $raps2->pw_load( B<file> => I<file> | B<name> => I<name> )
 
-Loads a password from I<file> (or account I<name>), requires
-B<get_master_password> to have been called before. Returns a hashref
-containing its url, login and decrypted password and extra.
+Load a password from I<file> (or account I<name>), requires
+B<get_master_password> to have been called before.
+
+Returns a hashref containing its url, login, salt and decrypted password and
+extra.
+
+=item $raps2->pw_load_info( B<file> => I<file> | B<name> => I<name> )
+
+Load all unencrypted data from I<file> (or account I<name>). Unlike
+B<pw_load>, this method does not require a prior call to
+B<get_master_password>.
+
+Returns a hashref with url, login and salt.
 
 =back
 
@@ -287,6 +306,11 @@ Returns the App::Raps2::Password(3pm) object.
 =item $raps2->ui()
 
 Returns the App::Raps2::UI(3pm) object.
+
+=item $raps2->file_to_hash( I<$file> )
+
+Reads $file (lines with key/value separated by whitespace) and returns a
+hashref with its key/value pairs.
 
 =back
 

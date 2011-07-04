@@ -141,7 +141,7 @@ sub cmd_info {
 		exit 2;
 	}
 
-	my $key = $raps2->file_to_hash($pwfile);
+	my $key = $raps2->pw_load_info( file => $pwfile );
 	$raps2->ui->output( [ 'URL', $key->{url} ], [ 'Login', $key->{login} ], );
 
 	return;
@@ -151,7 +151,7 @@ sub cmd_list {
 	my @files = read_dir( data_home('raps2') );
 
 	for my $file ( sort @files ) {
-		my $key = $raps2->file_to_hash( data_files("raps2/${file}") );
+		my $key = $raps2->pw_load_info( name => $file );
 		$raps2->ui->list(
 			[ 'Account', $file ],
 			[ 'Login',   $key->{login} ],
