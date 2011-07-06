@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 $ENV{XDG_CONFIG_HOME} = 't/config';
 $ENV{XDG_DATA_HOME}   = 't/data';
@@ -20,6 +20,8 @@ is_deeply(
 	{ key => 'value', otherkey => 'othervalue' },
 	'file_to_hash works',
 );
+
+is ($r2->ui, undef, 'no_cli works (no UI object created)');
 
 $r2->pw_save(
 	password => 'foopass',
