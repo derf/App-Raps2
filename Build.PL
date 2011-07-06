@@ -8,7 +8,6 @@ my $build = Module::Build->new(
 	build_requires => {
 		'Test::Command' => 0,
 		'Test::Compile' => 0,
-		'Test::MockObject' => 0,
 		'Test::More' => 0,
 		'Test::Pod' => 0,
 	},

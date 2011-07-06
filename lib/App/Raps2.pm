@@ -20,7 +20,9 @@ sub new {
 	$self->{xdg_conf} = config_home('raps2');
 	$self->{xdg_data} = data_home('raps2');
 
-	$self->{ui} = App::Raps2::UI->new();
+	if ( not $opt{no_cli} ) {
+		$self->{ui} = App::Raps2::UI->new();
+	}
 
 	$self->{default} = \%opt;
 
@@ -236,6 +238,12 @@ Accepted configuration parameters are:
 =item B<cost> => I<int>
 
 B<cost> of key setup, passed on to App::Raps2::Password(3pm).
+
+=item B<no_cli> => I<bool>
+
+If set to true, App::Raps2 assumes it will not be used as a CLI. It won't
+initialize its Term::ReadLine object and won't try to read anything from the
+terminal.
 
 =back
 

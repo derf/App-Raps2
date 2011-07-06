@@ -1,5 +1,7 @@
 git HEAD
 
+    * Remove Test::MockObject dependency
+
     [App::Raps2]
     * Move cmd_* functions into raps2
     * Rename pw_add t pw_save
@@ -10,6 +12,7 @@ git HEAD
     * Add pw_load_info method
     * The 'salt' argument to pw_add is now optional
     * Add the 'master_password' option to the 'new' method
+    * Add the no_cli option to App::Raps2->new()
 
 App::Raps2 0.4 - Sun Jul 03 2011
 

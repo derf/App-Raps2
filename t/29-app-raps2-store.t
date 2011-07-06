@@ -3,23 +3,14 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More;
-
-eval "use Test::MockObject";
-plan skip_all => 'Test::MockObject required' if $@;
+use Test::More tests => 9;
 
 $ENV{XDG_CONFIG_HOME} = 't/config';
 $ENV{XDG_DATA_HOME}   = 't/data';
 
-plan tests => 9;
-
-my $mock = Test::MockObject->new();
-$mock->fake_module( 'Term::ReadLine', new => sub { return bless( {}, $_[0] ) },
-);
-
 use_ok('App::Raps2');
 
-my $r2 = App::Raps2->new( master_password => 'sekrit' );
+my $r2 = App::Raps2->new( master_password => 'sekrit', no_cli => 1 );
 isa_ok( $r2, 'App::Raps2' );
 
 ok( -e 't/config/raps2/password', 'config file created' );
