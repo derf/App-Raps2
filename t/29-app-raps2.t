@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 $ENV{XDG_CONFIG_HOME} = 't/config';
 $ENV{XDG_DATA_HOME}   = 't/data';
@@ -14,6 +14,12 @@ my $r2 = App::Raps2->new( master_password => 'sekrit', no_cli => 1 );
 isa_ok( $r2, 'App::Raps2' );
 
 ok( -e 't/config/raps2/password', 'config file created' );
+
+is_deeply(
+	$r2->file_to_hash('t/in/hash'),
+	{ key => 'value', otherkey => 'othervalue' },
+	'file_to_hash works',
+);
 
 $r2->pw_save(
 	password => 'foopass',
