@@ -1,6 +1,7 @@
 git HEAD
 
     * Remove Test::MockObject dependency
+    * Declare Test::Fatal dependency
 
     [App::Raps2]
     * Move cmd_* functions into raps2
