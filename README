@@ -27,5 +27,5 @@ Testing
 
 $ perl Build test
 
-Note that this will require the Test::More, Test::Compile and Test::Pod
-modules.
+Note that this will require the Test::More, Test::Fatal, Test::Compile and
+Test::Pod modules.

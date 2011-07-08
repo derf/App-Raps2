@@ -1,5 +1,6 @@
-git HEAD
+App::Raps2 0.50 - Fri Jul 08 2011
 
+    * Switch to perl version scheme
     * Remove Test::MockObject dependency
     * Declare Test::Fatal dependency
 

@@ -13,7 +13,7 @@ use File::Slurp qw(read_dir);
 my $raps2 = App::Raps2->new();
 my ( $action, @args ) = @ARGV;
 
-our $VERSION = '0.4';
+our $VERSION = '0.50';
 
 sub file_must_exist {
 	my ( $file, $name ) = @_;
@@ -204,7 +204,7 @@ B<raps2> I<action> I<args ...>
 
 =head1 VERSION
 
-This manual documents B<raps2> version 0.4
+This manual documents B<raps2> version 0.50
 
 =head1 DESCRIPTION
 
@@ -254,6 +254,10 @@ Show information about I<account>, does not require the master password.
 =item B<list>
 
 List all saved accounts with their respective Logins and URLs
+
+=item B<version>
+
+Show version information
 
 =back
 
