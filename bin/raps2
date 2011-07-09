@@ -40,6 +40,10 @@ sub file_must_not_exist {
 sub cmd_add {
 	my ($name) = @_;
 
+	if ( not $name ) {
+		cmd_help( 1, 'add <account>' );
+	}
+
 	my $pwfile = data_home('raps2') . "/${name}";
 
 	file_must_not_exist( $pwfile, $name );
@@ -65,6 +69,10 @@ sub cmd_add {
 sub cmd_dump {
 	my ($name) = @_;
 
+	if ( not $name ) {
+		cmd_help( 1, 'dump <account>' );
+	}
+
 	my $pwfile = data_files("raps2/${name}");
 
 	file_must_exist( $pwfile, $name );
@@ -87,6 +95,10 @@ sub cmd_dump {
 
 sub cmd_edit {
 	my ($name) = @_;
+
+	if ( not $name ) {
+		cmd_help( 1, 'edit <account>' );
+	}
 
 	my $pwfile = data_files("raps2/${name}");
 
@@ -122,6 +134,10 @@ sub cmd_edit {
 sub cmd_get {
 	my ($name) = @_;
 
+	if ( not $name ) {
+		cmd_help( 1, 'get <account>' );
+	}
+
 	my $pwfile = data_files("raps2/${name}");
 
 	file_must_exist( $pwfile, $name );
@@ -139,8 +155,23 @@ sub cmd_get {
 	return;
 }
 
+sub cmd_help {
+	my ( $exit_status, $subcmd ) = @_;
+
+	$subcmd //= 'add|get|dump|... [account]';
+
+	say "Usage: raps2 ${subcmd}";
+	say 'See also: "man raps2"';
+
+	exit $exit_status;
+}
+
 sub cmd_info {
 	my ($name) = @_;
+
+	if ( not $name ) {
+		cmd_help( 1, 'info <account>' );
+	}
 
 	my $pwfile = data_files("raps2/${name}");
 
@@ -170,6 +201,10 @@ sub cmd_list {
 sub cmd_remove {
 	my ($name) = @_;
 
+	if ( not $name ) {
+		cmd_help( 1, 'del <account>' );
+	}
+
 	my $pwfile = data_files("raps2/${name}");
 
 	file_must_exist( $pwfile, $name );
@@ -181,15 +216,18 @@ sub cmd_remove {
 }
 
 given ($action) {
-	when ('add')     { cmd_add(@args) }
-	when ('del')     { cmd_remove(@args) }
-	when ('dump')    { cmd_dump(@args) }
-	when ('edit')    { cmd_edit(@args) }
-	when ('get')     { cmd_get(@args) }
-	when ('info')    { cmd_info(@args) }
-	when ('list')    { cmd_list(@args) }
-	when ('version') { say "raps2 version ${VERSION}" }
-	default          { die "Unknown action: ${action}\n" }
+	when ('add')  { cmd_add(@args) }
+	when ('del')  { cmd_remove(@args) }
+	when ('dump') { cmd_dump(@args) }
+	when ('edit') { cmd_edit(@args) }
+	when ('get')  { cmd_get(@args) }
+	when ('info') { cmd_info(@args) }
+	when ('list') { cmd_list(@args) }
+
+	when ( [qw[version -v --version]] ) { say "raps2 version ${VERSION}" }
+	when ( [qw[help    -h --help   ]] ) { cmd_help(0) }
+
+	default { cmd_help(1) }
 }
 
 __END__
