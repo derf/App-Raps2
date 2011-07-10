@@ -146,7 +146,8 @@ sub cmd_get {
 
 	my $key = $raps2->pw_load( file => $pwfile );
 
-	$raps2->ui->to_clipboard( $key->{password} );
+	$raps2->ui->to_clipboard( $key->{password} )
+	  or die("Could not place password in clipboard: ${!}\n");
 
 	if ( $key->{extra} ) {
 		print $key->{extra};

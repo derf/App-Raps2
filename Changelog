@@ -2,6 +2,9 @@ git HEAD
 
     * Major usability improvements
 
+    [App::Raps2::UI]
+    * to_clipboard: Return undef if xclip dosn't run, true otherwise
+
 App::Raps2 0.50 - Fri Jul 08 2011
 
     * Switch to perl version scheme
