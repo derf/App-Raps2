@@ -1,3 +1,7 @@
+App::Raps2 0.52 - Wed Jul 20 2011
+
+    * raps2 add: Fix pwgen usage (remove trailing whitespace)
+
 App::Raps2 0.51 - Wed Jul 20 2011
 
     * Major usability improvements

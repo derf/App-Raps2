@@ -13,7 +13,7 @@ use Getopt::Long qw(:config no_ignore_case);
 
 my ( $default_cost, $no_echo, $paste, $pwgen_cmd );
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 GetOptions(
 	'c|cost=i'      => \$default_cost,
@@ -275,7 +275,7 @@ B<raps2> [I<options>] I<action> [I<args ...>]
 
 =head1 VERSION
 
-This manual documents B<raps2> version 0.51
+This manual documents B<raps2> version 0.52
 
 =head1 DESCRIPTION
 
@@ -369,6 +369,8 @@ Note that it can only be pasted once.
 
 When the user does not enter a password in B<raps2 add>, it will execute
 I<command> to create one. The first line of output is taken as password.
+If the output contains spaces, anything after the first space (plus the space
+itself) is discarded.
 
 Default: pwgen -s 23 1
 

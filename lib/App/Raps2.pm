@@ -12,7 +12,7 @@ use File::BaseDir qw(config_home data_home);
 use File::Path qw(make_path);
 use File::Slurp qw(slurp write_file);
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 sub new {
 	my ( $class, %opt ) = @_;
@@ -186,7 +186,7 @@ sub generate_password {
 	my ($self) = @_;
 
 	open( my $pwgen, q{-|}, $self->conf('pwgen_cmd') ) or return;
-	my $password = <$pwgen>;
+	my $password = ( split( / /, <$pwgen> ) )[0];
 	close($pwgen) or cluck("Cannot close pwgen pipe: $!");
 
 	chomp $password;
@@ -299,7 +299,7 @@ B<App::Raps2> is the backend for B<raps2>, a simple commandline password safe.
 
 =head1 VERSION
 
-This manual documents App::Raps2 version 0.51
+This manual documents App::Raps2 version 0.52
 
 =head1 METHODS
 
@@ -394,7 +394,7 @@ from the defaults config file.
 =item $raps2->generate_password()
 
 Runs B<pwgen_cmd> (as specified in B<new> or the config file) and returns its
-first line of output, without the trailing newline.
+first word of output, without trailing newlines / whitespaces.
 
 =back
 
