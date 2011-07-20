@@ -11,7 +11,7 @@ use File::BaseDir qw(data_files data_home);
 use File::Slurp qw(read_dir);
 use Getopt::Long qw(:config no_ignore_case);
 
-my ( $default_cost, $no_echo, $pwgen_cmd );
+my ( $default_cost, $no_echo, $paste, $pwgen_cmd );
 
 our $VERSION = '0.50';
 
@@ -20,6 +20,7 @@ GetOptions(
 	'E|no-echo'     => \$no_echo,
 	'h|help'        => sub { cmd_help(0) },
 	'p|pwgen-cmd=s' => \$pwgen_cmd,
+	'P|paste'       => \$paste,
 	'V|version'     => sub { say "raps2 version ${VERSION}"; exit 0 },
 
 ) or cmd_help(1);
@@ -79,7 +80,10 @@ sub cmd_add {
 			exit 3;
 		}
 
-		if ( not $no_echo ) {
+		if ($paste) {
+			$raps2->ui->to_clipboard($pass);
+		}
+		elsif ( not $no_echo ) {
 			$raps2->ui->output( [ 'Generated password', $pass ] );
 		}
 	}
@@ -298,7 +302,7 @@ If you do not provide a password (that is, leave both "Password" and "Verify"
 lines blank), B<raps2> will use the B<pwgen> command to create one for you and
 print the generated password on stdout.
 
-See also the B<-c>, B<-E> and B<-p> options.
+See also the B<-c>, B<-E>, B<-p> and B<-P> options.
 
 =item B<del> I<account>
 
@@ -353,6 +357,13 @@ Default: 12
 
 When using the pwgen functionality of B<raps2 add>, do not print the generated
 password on stdout.
+
+=item B<-P>, B<--paste>
+
+When using the pwgen functionality of B<raps2 add>, do not print the generated
+password on stdout.  Place it in the X Clipboard instead.
+
+Note that it can only be pasted once.
 
 =item B<-p>, B<--pwgen-cmd> I<command>
 
