@@ -175,7 +175,8 @@ Returns a new 16-byte salt. Contains only printable characters.
 
 Returns the currently used salt and optionally changes it to I<salt>.
 
-=item $pass->encrypt(I<data>, [I<salt>])
+=item $pass->encrypt(B<data> => I<data>, [B<salt> => I<salt>],
+[B<cost> => I<cost>])
 
 Encrypts I<data> with the passphrase saved in the object, returns the
 corresponding hexadecimal hash (as string).
@@ -183,7 +184,8 @@ corresponding hexadecimal hash (as string).
 By default, the salt set in B<salt> or B<new> will be used. You can override
 it by specifying I<salt>.
 
-=item $pass->decrypt(I<hexstr>, [I<salt>])
+=item $pass->decrypt(B<data> => I<hexstr>, [B<salt> => I<salt>],
+[B<cost> => I<cost>])
 
 Decrypts I<hexstr> (as created by B<encrypt>), returns its original content.
 

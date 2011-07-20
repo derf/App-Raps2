@@ -16,6 +16,7 @@ my $build = Module::Build->new(
 	requires => {
 		'perl' => '5.10.0',
 		'Carp' => 0,
+		'Config::Tiny' => 0,
 		'Crypt::CBC' => 0,
 		'Crypt::Eksblowfish' => 0,
 		'Crypt::Eksblowfish::Bcrypt' => 0,

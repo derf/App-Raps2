@@ -275,6 +275,7 @@ sub pw_load_info {
 		url   => $key->{url},
 		login => $key->{login},
 		salt  => $key->{salt},
+		cost  => $key->{cost},
 	};
 }
 
@@ -316,13 +317,24 @@ Accepted configuration parameters are:
 
 B<cost> of key setup, passed on to App::Raps2::Password(3pm).
 
+Default: 12
+
 =item B<no_cli> => I<bool>
 
 If set to true, App::Raps2 assumes it will not be used as a CLI. It won't
 initialize its Term::ReadLine object and won't try to read anything from the
 terminal.
 
+=item B<pwgen_cmd> => I<comand>
+
+Command to use in B<generate_password>.
+
+Default: pwgen -s 23 1
+
 =back
+
+Note that the B<cost> and B<pwgen_cmd> options specified here take precedence
+over those loaded from the config file.
 
 =item $raps2->get_master_password( [I<$password>] )
 
@@ -334,8 +346,8 @@ specified, otherwise it asks the user via App::Raps2::UI(3pm).
 Load a password from I<file> (or account I<name>), requires
 B<get_master_password> to have been called before.
 
-Returns a hashref containing its url, login, salt and decrypted password and
-extra.
+Returns a hashref containing its url, login, salt, cost and decrypted password
+and extra.
 
 =item $raps2->pw_load_info( B<file> => I<file> | B<name> => I<name> )
 
@@ -343,7 +355,7 @@ Load all unencrypted data from I<file> (or account I<name>). Unlike
 B<pw_load>, this method does not require a prior call to
 B<get_master_password>.
 
-Returns a hashref with url, login and salt.
+Returns a hashref with url, login, salt and cost.
 
 =item $raps2->pw_save( I<%data> )
 
@@ -357,6 +369,8 @@ The following I<data> keys are supported:
 =item B<password> => I<password to encrypt> (mandatory)
 
 =item B<salt> => I<salt>
+
+=item B<cost> => I<cost> (optional, inferred from B<new> / the config otherwise)
 
 =item B<file> => I<file> | B<name> => I<name> (one must be set)
 
@@ -372,6 +386,16 @@ The following I<data> keys are supported:
 
 Returns the App::Raps2::UI(3pm) object.
 
+=item $raps2->conf(I<key>)
+
+Returns the current config value of I<key>, either set by B<new> or loaded
+from the defaults config file.
+
+=item $raps2->generate_password()
+
+Runs B<pwgen_cmd> (as specified in B<new> or the config file) and returns its
+first line of output, without the trailing newline.
+
 =back
 
 =head2 INTERNAL
@@ -382,11 +406,20 @@ You usually don't need to call these methods by yourself.
 
 =item $raps2->create_config()
 
-Creates a default config and asks the user to set a master password.
+Creates a password file and asks the user to set a master password.
 
 =item $raps2->load_config()
 
 Load config. Automatically called by B<new>.
+
+=item $raps2->create_defaults()
+
+Creates a defaults config file containing the default key setup cost and pwgen
+command.
+
+=item $raps2->load_defaults()
+
+Loads the defaults file. Automatically called by B<new>.
 
 =item $raps2->pw()
 
@@ -403,7 +436,7 @@ Create working directories (~/.config/raps2 and ~/.local/share/raps2, or the
 respective XDG environment variable contents), if they don't exist yet.
 Automatically called by B<new>.
 
-Calls B<create_config> if no raps2 config was found.
+Calls B<create_config> and B<create_defaults> if no configs were found.
 
 =back
 
@@ -420,6 +453,8 @@ File::Slurp(3pm).
 =head1 BUGS AND LIMITATIONS
 
 Be aware that the password handling API is not yet stable.
+Also, so far the development concentrated on B<raps2>, so this module / its
+documentation may not be completely up-to-date.
 
 =head1 AUTHOR
 
