@@ -96,8 +96,8 @@ sub create_config {
 
 	my $cost = $self->{master_cost} = $self->{default}{cost} // 12;
 
-	my $pass = $self->{default}{master_password}
-	  // $self->ui->read_pw( 'Master Password', 1 );
+	my $pass = $self->{default}{master_password} // $self->ui->read_pw(
+		'Running for the first time. Please choose a master password', 1 );
 
 	$self->{pass} = App::Raps2::Password->new(
 		cost       => $self->{master_cost},
@@ -149,8 +149,8 @@ sub load_defaults {
 
 	my $cfg = Config::Tiny->read( $self->{xdg_conf} . '/defaults' );
 
-	$self->{default}{cost}      = $cfg->{_}->{cost};
-	$self->{default}{pwgen_cmd} = $cfg->{_}->{pwgen_cmd};
+	$self->{default}{cost}      //= $cfg->{_}->{cost};
+	$self->{default}{pwgen_cmd} //= $cfg->{_}->{pwgen_cmd};
 
 	return;
 }

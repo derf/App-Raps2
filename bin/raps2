@@ -11,16 +11,24 @@ use File::BaseDir qw(data_files data_home);
 use File::Slurp qw(read_dir);
 use Getopt::Long qw(:config no_ignore_case);
 
-my $raps2 = App::Raps2->new();
-my ( $action, @args ) = @ARGV;
+my ( $default_cost, $echo_generated, $pwgen_cmd );
 
 our $VERSION = '0.50';
 
 GetOptions(
-	'h|help'    => sub { cmd_help(0) },
-	'V|version' => sub { say "raps2 version ${VERSION}"; exit 0 },
+	'c|cost=i'      => \$default_cost,
+	'e|echo'        => \$echo_generated,
+	'h|help'        => sub { cmd_help(0) },
+	'p|pwgen_cmd=s' => \$pwgen_cmd,
+	'V|version'     => sub { say "raps2 version ${VERSION}"; exit 0 },
 
 ) or cmd_help(1);
+
+my ( $action, @args ) = @ARGV;
+my $raps2 = App::Raps2->new(
+	cost      => $default_cost,
+	pwgen_cmd => $pwgen_cmd
+);
 
 sub file_must_exist {
 	my ( $file, $name ) = @_;
@@ -69,6 +77,10 @@ sub cmd_add {
 			say STDERR "Password generation failed: ${!}: "
 			  . $raps2->conf('pwgen_cmd');
 			exit 3;
+		}
+
+		if ($echo_generated) {
+			$raps2->ui->output( [ 'Generated password', $pass ] );
 		}
 	}
 
