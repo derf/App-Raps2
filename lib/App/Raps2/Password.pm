@@ -59,27 +59,29 @@ sub salt {
 }
 
 sub encrypt {
-	my ( $self, $in, $salt ) = @_;
+	my ( $self, %opt ) = @_;
 
-	$salt //= $self->{salt};
+	$opt{salt} //= $self->{salt};
+	$opt{cost} //= $self->{cost};
 
 	my $eksblowfish
-	  = Crypt::Eksblowfish->new( $self->{cost}, $salt, $self->{passphrase}, );
+	  = Crypt::Eksblowfish->new( $opt{cost}, $opt{salt}, $self->{passphrase}, );
 	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish );
 
-	return $cbc->encrypt_hex($in);
+	return $cbc->encrypt_hex( $opt{data} );
 }
 
 sub decrypt {
-	my ( $self, $in, $salt ) = @_;
+	my ( $self, %opt ) = @_;
 
-	$salt //= $self->{salt};
+	$opt{cost} //= $self->{cost};
+	$opt{salt} //= $self->{salt};
 
 	my $eksblowfish
-	  = Crypt::Eksblowfish->new( $self->{cost}, $salt, $self->{passphrase}, );
+	  = Crypt::Eksblowfish->new( $opt{cost}, $opt{salt}, $self->{passphrase}, );
 	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish );
 
-	return $cbc->decrypt_hex($in);
+	return $cbc->decrypt_hex( $opt{data} );
 }
 
 sub bcrypt {

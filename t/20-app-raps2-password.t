@@ -67,10 +67,10 @@ $pw = App::Raps2::Password->new(
 
 isa_ok($pw, 'App::Raps2::Password');
 
-is($pw->decrypt('53616c7465645f5f80d8c367e15980d43ec9a6eabc5390b4'), 'quux',
+is($pw->decrypt(data => '53616c7465645f5f80d8c367e15980d43ec9a6eabc5390b4'), 'quux',
 	'decrypt okay');
 
-is($pw->decrypt($pw->encrypt('foo')), 'foo', 'encrypt->decrypt okay');
+is($pw->decrypt(data => $pw->encrypt(data => 'foo')), 'foo', 'encrypt->decrypt okay');
 
 ok($pw->verify('3lJRlaRuOGWv/z3g1DAOlcH.u9vS8Wm'), 'verify: verifies correct hash');
 

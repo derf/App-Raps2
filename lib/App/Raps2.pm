@@ -76,20 +76,20 @@ sub get_master_password {
 	}
 
 	$self->{pass} = App::Raps2::Password->new(
-		cost       => $self->{default}{cost},
+		cost       => $self->{master_cost},
 		salt       => $self->{master_salt},
 		passphrase => $pass,
 	);
 
-	$self->{pass}->verify( $self->{master_hash} );
+	$self->pw->verify( $self->{master_hash} );
 
 	return;
 }
 
 sub create_config {
 	my ($self) = @_;
-	my $cost   = 12;
-	my $pass   = $self->{default}{master_password}
+	my $cost = $self->{default}{cost} // 12;
+	my $pass = $self->{default}{master_password}
 	  // $self->ui->read_pw( 'Master Password', 1 );
 
 	$self->{pass} = App::Raps2::Password->new(
@@ -104,6 +104,7 @@ sub create_config {
 		"cost ${cost}\n",
 		"salt ${salt}\n",
 		"hash ${hash}\n",
+		"new_cost ${cost}\n",
 	);
 
 	return;
@@ -114,7 +115,8 @@ sub load_config {
 	my $cfg = $self->file_to_hash( $self->{xdg_conf} . '/password' );
 	$self->{master_hash} = $cfg->{hash};
 	$self->{master_salt} = $cfg->{salt};
-	$self->{default}{cost} //= $cfg->{cost};
+	$self->{master_cost} = $cfg->{cost};
+	$self->{default}{cost} //= $cfg->{new_cost} // 12;
 
 	return;
 }
@@ -147,11 +149,18 @@ sub pw_save {
 	$data{login} //= q{};
 	$data{salt}  //= $self->pw->create_salt();
 	$data{url}   //= q{};
+	$data{cost}  //= $self->{default}{cost};
 
-	my $pass_hash = $self->pw->encrypt( $data{password}, $data{salt} );
+	my $pass_hash = $self->pw->encrypt(
+		data => $data{password},
+		salt => $data{salt}
+	);
 	my $extra_hash = (
-		  $data{extra}
-		? $self->pw->encrypt( $data{extra}, $data{salt} )
+		$data{extra}
+		? $self->pw->encrypt(
+			data => $data{extra},
+			salt => $data{salt}
+		  )
 		: q{}
 	);
 
@@ -159,6 +168,7 @@ sub pw_save {
 		$data{file},
 		"url $data{url}\n",
 		"login $data{login}\n",
+		"cost $data{cost}\n",
 		"salt $data{salt}\n",
 		"hash ${pass_hash}\n",
 		"extra ${extra_hash}\n",
@@ -177,11 +187,17 @@ sub pw_load {
 	return {
 		url      => $key->{url},
 		login    => $key->{login},
-		password => $self->pw->decrypt( $key->{hash}, $key->{salt} ),
-		salt     => $key->{salt},
-		extra    => (
-			  $key->{extra}
-			? $self->pw->decrypt( $key->{extra}, $key->{salt} )
+		password => $self->pw->decrypt(
+			data => $key->{hash},
+			salt => $key->{salt}
+		),
+		salt  => $key->{salt},
+		extra => (
+			$key->{extra}
+			? $self->pw->decrypt(
+				data => $key->{extra},
+				salt => $key->{salt}
+			  )
 			: undef
 		),
 	};
