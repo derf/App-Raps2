@@ -88,23 +88,37 @@ sub get_master_password {
 
 sub create_config {
 	my ($self) = @_;
-	my $cost = $self->{default}{cost} // 12;
+
+	$self->{default}{cost} //= 12;
+	$self->{master_cost} = $self->{default}{cost};
+
 	my $pass = $self->{default}{master_password}
 	  // $self->ui->read_pw( 'Master Password', 1 );
 
 	$self->{pass} = App::Raps2::Password->new(
-		cost       => $cost,
+		cost       => $self->{master_cost},
 		passphrase => $pass,
 	);
-	my $hash = $self->pw->bcrypt();
-	my $salt = $self->pw->salt();
+
+	$self->write_config();
+
+	return;
+}
+
+sub write_config {
+	my ($self) = @_;
+
+	my $cost     = $self->{master_cost};
+	my $salt     = $self->pw->salt;
+	my $hash     = $self->pw->bcrypt;
+	my $new_cost = $self->{default}{cost};
 
 	write_file(
 		$self->{xdg_conf} . '/password',
 		"cost ${cost}\n",
 		"salt ${salt}\n",
 		"hash ${hash}\n",
-		"new_cost ${cost}\n",
+		"new_cost ${new_cost}\n",
 	);
 
 	return;
