@@ -22,6 +22,7 @@ my $build = Module::Build->new(
 		'File::BaseDir' => 0,
 		'File::Path' => 2.06_05,
 		'File::Slurp' => 0,
+		'Getopt::Long' => 0,
 		'POSIX' => 0,
 		'Term::ReadLine' => 0,
 	},

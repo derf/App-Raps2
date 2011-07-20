@@ -9,11 +9,18 @@ use 5.010;
 use App::Raps2;
 use File::BaseDir qw(data_files data_home);
 use File::Slurp qw(read_dir);
+use Getopt::Long qw(:config no_ignore_case);
 
 my $raps2 = App::Raps2->new();
 my ( $action, @args ) = @ARGV;
 
 our $VERSION = '0.50';
+
+GetOptions(
+	'h|help'    => sub { cmd_help(0) },
+	'V|version' => sub { say "raps2 version ${VERSION}"; exit 0 },
+
+) or cmd_help(1);
 
 sub file_must_exist {
 	my ( $file, $name ) = @_;
@@ -224,9 +231,6 @@ given ($action) {
 	when ('get')  { cmd_get(@args) }
 	when ('info') { cmd_info(@args) }
 	when ('list') { cmd_list(@args) }
-
-	when ( [qw[version -v --version]] ) { say "raps2 version ${VERSION}" }
-	when ( [qw[help    -h --help   ]] ) { cmd_help(0) }
 
 	default { cmd_help(1) }
 }
