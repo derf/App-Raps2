@@ -6,7 +6,7 @@ use 5.010;
 
 use App::Raps2::Password;
 use App::Raps2::UI;
-use Carp qw(confess);
+use Carp qw(cluck confess);
 use Config::Tiny;
 use File::BaseDir qw(config_home data_home);
 use File::Path qw(make_path);
@@ -155,15 +155,10 @@ sub load_defaults {
 	return;
 }
 
-sub cost {
-	my ( $self, $cost ) = @_;
+sub conf {
+	my ( $self, $key ) = @_;
 
-	if ($cost) {
-		$self->{default}{cost} = $cost;
-		$self->write_config();
-	}
-
-	return $self->{default}{cost};
+	return $self->{default}{$key};
 }
 
 sub pw {
@@ -185,6 +180,18 @@ sub ui {
 	my ($self) = @_;
 
 	return $self->{ui};
+}
+
+sub generate_password {
+	my ($self) = @_;
+
+	open( my $pwgen, q{-|}, $self->conf('pwgen_cmd') ) or return;
+	my $password = <$pwgen>;
+	close($pwgen) or cluck("Cannot close pwgen pipe: $!");
+
+	chomp $password;
+
+	return $password;
 }
 
 sub pw_save {
@@ -236,9 +243,9 @@ sub pw_load {
 	# use the one of the master password
 
 	return {
-		url   => $key->{url},
-		login => $key->{login},
-		cost => $key->{cost} // $self->{master_cost},
+		url      => $key->{url},
+		login    => $key->{login},
+		cost     => $key->{cost} // $self->{master_cost},
 		password => $self->pw->decrypt(
 			data => $key->{hash},
 			salt => $key->{salt},

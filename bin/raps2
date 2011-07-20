@@ -62,6 +62,16 @@ sub cmd_add {
 	my $pass  = $raps2->ui->read_pw( 'Password', 1 );
 	my $extra = $raps2->ui->read_multiline('Additional content');
 
+	if ( length($pass) == 0 ) {
+		$pass = $raps2->generate_password();
+
+		if ( not $pass ) {
+			say STDERR "Password generation failed: ${!}: "
+			  . $raps2->conf('pwgen_cmd');
+			exit 3;
+		}
+	}
+
 	$raps2->pw_save(
 		file     => $pwfile,
 		url      => $url,
