@@ -7,6 +7,7 @@ use 5.010;
 use App::Raps2::Password;
 use App::Raps2::UI;
 use Carp qw(confess);
+use Config::Tiny;
 use File::BaseDir qw(config_home data_home);
 use File::Path qw(make_path);
 use File::Slurp qw(slurp write_file);
@@ -31,6 +32,7 @@ sub new {
 	if ( not $opt{dont_touch_fs} ) {
 		$self->sanity_check();
 		$self->load_config();
+		$self->load_defaults();
 	}
 
 	if ( $opt{master_password} ) {
@@ -64,6 +66,9 @@ sub sanity_check {
 	if ( not -e $self->{xdg_conf} . '/password' ) {
 		$self->create_config();
 	}
+	if ( not -e $self->{xdg_conf} . '/defaults' ) {
+		$self->create_defaults();
+	}
 
 	return;
 }
@@ -89,8 +94,7 @@ sub get_master_password {
 sub create_config {
 	my ($self) = @_;
 
-	$self->{default}{cost} //= 12;
-	$self->{master_cost} = $self->{default}{cost};
+	my $cost = $self->{master_cost} = $self->{default}{cost} // 12;
 
 	my $pass = $self->{default}{master_password}
 	  // $self->ui->read_pw( 'Master Password', 1 );
@@ -100,25 +104,14 @@ sub create_config {
 		passphrase => $pass,
 	);
 
-	$self->write_config();
-
-	return;
-}
-
-sub write_config {
-	my ($self) = @_;
-
-	my $cost     = $self->{master_cost};
-	my $salt     = $self->pw->salt;
-	my $hash     = $self->pw->bcrypt;
-	my $new_cost = $self->{default}{cost};
+	my $hash = $self->{master_hash} = $self->pw->bcrypt;
+	my $salt = $self->{master_salt} = $self->pw->salt;
 
 	write_file(
 		$self->{xdg_conf} . '/password',
 		"cost ${cost}\n",
 		"salt ${salt}\n",
 		"hash ${hash}\n",
-		"new_cost ${new_cost}\n",
 	);
 
 	return;
@@ -126,13 +119,51 @@ sub write_config {
 
 sub load_config {
 	my ($self) = @_;
+
 	my $cfg = $self->file_to_hash( $self->{xdg_conf} . '/password' );
+
 	$self->{master_hash} = $cfg->{hash};
 	$self->{master_salt} = $cfg->{salt};
 	$self->{master_cost} = $cfg->{cost};
-	$self->{default}{cost} //= $cfg->{new_cost} // 12;
 
 	return;
+}
+
+sub create_defaults {
+	my ($self) = @_;
+
+	my $cost      = $self->{default}{cost}      // 12;
+	my $pwgen_cmd = $self->{default}{pwgen_cmd} // 'pwgen -s 23 1';
+
+	write_file(
+		$self->{xdg_conf} . '/defaults',
+		"cost = ${cost}\n",
+		"pwgen_cmd = ${pwgen_cmd}\n",
+	);
+
+	return;
+}
+
+sub load_defaults {
+	my ($self) = @_;
+
+	my $cfg = Config::Tiny->read( $self->{xdg_conf} . '/defaults' );
+
+	$self->{default}{cost}      = $cfg->{_}->{cost};
+	$self->{default}{pwgen_cmd} = $cfg->{_}->{pwgen_cmd};
+
+	return;
+}
+
+sub cost {
+	my ( $self, $cost ) = @_;
+
+	if ($cost) {
+		$self->{default}{cost} = $cost;
+		$self->write_config();
+	}
+
+	return $self->{default}{cost};
 }
 
 sub pw {
@@ -167,13 +198,15 @@ sub pw_save {
 
 	my $pass_hash = $self->pw->encrypt(
 		data => $data{password},
-		salt => $data{salt}
+		salt => $data{salt},
+		cost => $data{cost},
 	);
 	my $extra_hash = (
 		$data{extra}
 		? $self->pw->encrypt(
 			data => $data{extra},
-			salt => $data{salt}
+			salt => $data{salt},
+			cost => $data{cost},
 		  )
 		: q{}
 	);
@@ -198,19 +231,26 @@ sub pw_load {
 
 	my $key = $self->file_to_hash( $data{file} );
 
+	# $self->{default}{cost} is the normal way, but older password files
+	# (created before the custom cost support) do not have a cost field and
+	# use the one of the master password
+
 	return {
-		url      => $key->{url},
-		login    => $key->{login},
+		url   => $key->{url},
+		login => $key->{login},
+		cost => $key->{cost} // $self->{master_cost},
 		password => $self->pw->decrypt(
 			data => $key->{hash},
-			salt => $key->{salt}
+			salt => $key->{salt},
+			cost => $key->{cost} // $self->{master_cost},
 		),
 		salt  => $key->{salt},
 		extra => (
 			$key->{extra}
 			? $self->pw->decrypt(
 				data => $key->{extra},
-				salt => $key->{salt}
+				salt => $key->{salt},
+				cost => $key->{cost} // $self->{master_cost},
 			  )
 			: undef
 		),

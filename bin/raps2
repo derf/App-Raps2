@@ -116,6 +116,7 @@ sub cmd_edit {
 	my $key = $raps2->pw_load( file => $pwfile );
 
 	my $salt     = $key->{salt};
+	my $cost     = $key->{cost};
 	my $url      = $raps2->ui->read_line( 'URL', $key->{url} );
 	my $login    = $raps2->ui->read_line( 'Login', $key->{login} );
 	my $pass     = $key->{password};
@@ -129,6 +130,7 @@ sub cmd_edit {
 	$raps2->pw_save(
 		file     => $pwfile,
 		salt     => $salt,
+		cost     => $cost,
 		url      => $url,
 		login    => $login,
 		password => $pass,

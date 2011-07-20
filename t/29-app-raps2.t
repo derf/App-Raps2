@@ -56,3 +56,4 @@ is( $r2->pw_load( file => 't/data/raps2/test2' )->{extra},
 unlink('t/data/raps2/test1');
 unlink('t/data/raps2/test2');
 unlink('t/config/raps2/password');
+unlink('t/config/raps2/defaults');
