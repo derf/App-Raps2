@@ -13,7 +13,7 @@ use Getopt::Long qw(:config no_ignore_case);
 
 my ( $default_cost, $no_echo, $paste, $pwgen_cmd );
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 GetOptions(
 	'c|cost=i'      => \$default_cost,
@@ -271,11 +271,11 @@ raps2 - "Right, Another Password Store" take two
 
 =head1 SYNOPSIS
 
-B<raps2> I<action> I<args ...>
+B<raps2> [I<options>] I<action> [I<args ...>]
 
 =head1 VERSION
 
-This manual documents B<raps2> version 0.50
+This manual documents B<raps2> version 0.51
 
 =head1 DESCRIPTION
 
@@ -386,7 +386,7 @@ zero on success, non-zero otherwise.
 
 raps2 saves the master password hash in F<~/.config/raps2/password>.
 
-The configuation (key setup cost and pwgen command) is stored in
+The configuration (key setup cost and pwgen command) is stored in
 F<~/.config/raps2/defaults> in an INI-like format.
 
 Additional encrypted passwords are stored in F<~/.local/share/raps2/>.
@@ -409,6 +409,8 @@ B<XDG_DATA_HOME> environment variables.
 =item * File::Path (usually included with perl core)
 
 =item * File::Slurp
+
+=item * pwgen (if you want C<< raps2 add >> to generate passwords)
 
 =item * xclip (for C<< raps2 get >>)
 

@@ -1,6 +1,20 @@
-git HEAD
+App::Raps2 0.51 - Wed Jul 20 2011
 
     * Major usability improvements
+    * New dependency Config::Tiny
+    * New configuration file .config/raps2/defaults
+    * Add --cost option to set cost for raps2 add
+    * raps2 add: Use pwgen to create password if none is specified
+    * Add --no-echo, --paste and --pwgen-cmd options for raps2 add / pwgen
+
+    [App::Raps2]
+    * new: Add pwgen_cmd argument
+    * Add create_defaults, load_defaults, conf and generate_password methods
+    * pw_save: Add optional cost argument
+    * pw_load, pw_load_info: Now also return the key setup cost
+
+    [App::Raps2::Password]
+    * encrypt, decrypt: Now take hash as argument, keys are data/salt/cost
 
     [App::Raps2::UI]
     * to_clipboard: Return undef if xclip dosn't run, true otherwise
