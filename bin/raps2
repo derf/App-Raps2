@@ -11,12 +11,13 @@ use File::BaseDir qw(data_files data_home);
 use File::Slurp qw(read_dir);
 use Getopt::Long qw(:config no_ignore_case);
 
-my ( $default_cost, $no_echo, $paste, $pwgen_cmd, $xclip_cmd );
+my ( $chrome, $default_cost, $no_echo, $paste, $pwgen_cmd, $xclip_cmd );
 
 our $VERSION = '0.52';
 
 GetOptions(
 	'c|cost=i'      => \$default_cost,
+	'C|chrome'      => \$chrome,
 	'E|no-echo'     => \$no_echo,
 	'h|help'        => sub { cmd_help(0) },
 	'p|pwgen-cmd=s' => \$pwgen_cmd,
@@ -25,6 +26,10 @@ GetOptions(
 	'x|xclip-cmd=s' => \$xclip_cmd,
 
 ) or cmd_help(1);
+
+if ($chrome) {
+	$xclip_cmd = 'xclip -l 2';
+}
 
 my ( $action, @args ) = @ARGV;
 my $raps2 = App::Raps2->new(
@@ -326,7 +331,7 @@ Decrypt I<account>'s password and store it in the primary X Clipboard.  Note
 that it can only be pasted once.  Prints the content of the multiline B<extra>
 field (if present) to stdout.
 
-See also the B<-x> option.
+See also the B<-C> and B<-x> options.
 
 =item B<info> I<account>
 
@@ -357,6 +362,16 @@ Crypt::Eksblowfish(3pm).
 
 Default: 12
 
+=item B<-C>, B<--chrome>
+
+Google Chrome support.  Normally, B<raps2 get> makes sure the password can
+only be pasted once, but Google Chrome (for whatever reason) needs to paste it
+twice.  Do not use this option if you are not going to paste the password into
+a Chrome window.
+
+Basically, this is a shortcut for C<< raps2 -x 'xclip -l 2' >>.  This
+overrides B<-x>.
+
 =item B<-E>, B<--no-echo>
 
 When using the pwgen functionality of B<raps2 add>, do not print the generated
@@ -367,7 +382,7 @@ password on stdout.
 When using the pwgen functionality of B<raps2 add>, do not print the generated
 password on stdout.  Place it in the X Clipboard instead.
 
-Note that it can only be pasted once.
+Note that it can only be pasted once, unless B<-x> or B<-C> is used.
 
 =item B<-p>, B<--pwgen-cmd> I<command>
 
@@ -384,8 +399,8 @@ Show version information.
 
 =item B<-x>, B<--xclip-cmd> I<command>
 
-Command to run for B<raps2 get>.  Set this to C<< xclip -l 2 >> if you are
-using chrome.  The password will be available on I<command>'s stdin.
+Command to run for B<raps2 get>.  The password will be available on
+I<command>'s stdin.
 
 Default: xclip -l 1
 
