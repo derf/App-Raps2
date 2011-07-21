@@ -89,15 +89,17 @@ sub read_pw {
 }
 
 sub to_clipboard {
-	my ( $self, $str ) = @_;
+	my ( $self, $str, $cmd ) = @_;
 
-	open( my $clipboard, q{|-}, 'xclip -l 1' )
+	$cmd //= 'xclip -l 1';
+
+	open( my $clipboard, q{|-}, $cmd )
 	  or return;
 
 	print $clipboard $str;
 
 	close($clipboard)
-	  or cluck("Failed to close pipe to xclip: $!");
+	  or cluck("Failed to close pipe to ${cmd}: ${!}");
 
 	return 1;
 }
@@ -172,9 +174,10 @@ Prompt the user for a password. I<message> is displayed, the user's input is
 noch echoed.  If I<verify> is set, the user has to enter the same input twice,
 otherwise B<read_pw> dies.  Returns the input.
 
-=item $ui->to_clipboard(I<$string>)
+=item $ui->to_clipboard(I<$string>, [I<command>])
 
-Place I<string> in the primary X Clipboard (by calling the B<xclip> program)
+Call I<command> to place I<string> in the primary X Clipboard.  I<command>
+defaults to C<< xclip -l 1 >>.
 
 Returns true upon success, undef if the operation failed. Use $! to get the
 error message.

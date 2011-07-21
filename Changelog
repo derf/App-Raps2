@@ -1,3 +1,7 @@
+git HEAD
+
+    * Make xclip command configurable (for chrome users, mostly)
+
 App::Raps2 0.52 - Wed Jul 20 2011
 
     * raps2 add: Fix pwgen usage (remove trailing whitespace)

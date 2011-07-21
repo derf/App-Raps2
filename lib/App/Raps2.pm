@@ -134,11 +134,13 @@ sub create_defaults {
 
 	my $cost      = $self->{default}{cost}      // 12;
 	my $pwgen_cmd = $self->{default}{pwgen_cmd} // 'pwgen -s 23 1';
+	my $xclip_cmd = $self->{default}{xclip_cmd} // 'xclip -l 1';
 
 	write_file(
 		$self->{xdg_conf} . '/defaults',
 		"cost = ${cost}\n",
 		"pwgen_cmd = ${pwgen_cmd}\n",
+		"xclip_cmd = ${xclip_cmd}\n",
 	);
 
 	return;
@@ -151,6 +153,7 @@ sub load_defaults {
 
 	$self->{default}{cost}      //= $cfg->{_}->{cost};
 	$self->{default}{pwgen_cmd} //= $cfg->{_}->{pwgen_cmd};
+	$self->{default}{xclip_cmd} //= $cfg->{_}->{xclip_cmd};
 
 	return;
 }

@@ -11,7 +11,7 @@ use File::BaseDir qw(data_files data_home);
 use File::Slurp qw(read_dir);
 use Getopt::Long qw(:config no_ignore_case);
 
-my ( $default_cost, $no_echo, $paste, $pwgen_cmd );
+my ( $default_cost, $no_echo, $paste, $pwgen_cmd, $xclip_cmd );
 
 our $VERSION = '0.52';
 
@@ -22,13 +22,15 @@ GetOptions(
 	'p|pwgen-cmd=s' => \$pwgen_cmd,
 	'P|paste'       => \$paste,
 	'V|version'     => sub { say "raps2 version ${VERSION}"; exit 0 },
+	'x|xclip-cmd=s' => \$xclip_cmd,
 
 ) or cmd_help(1);
 
 my ( $action, @args ) = @ARGV;
 my $raps2 = App::Raps2->new(
 	cost      => $default_cost,
-	pwgen_cmd => $pwgen_cmd
+	pwgen_cmd => $pwgen_cmd,
+	xclip_cmd => $xclip_cmd,
 );
 
 sub file_must_exist {
@@ -81,7 +83,7 @@ sub cmd_add {
 		}
 
 		if ($paste) {
-			$raps2->ui->to_clipboard($pass);
+			$raps2->ui->to_clipboard( $pass, $raps2->conf('xclip_cmd') );
 		}
 		elsif ( not $no_echo ) {
 			$raps2->ui->output( [ 'Generated password', $pass ] );
@@ -181,7 +183,7 @@ sub cmd_get {
 
 	my $key = $raps2->pw_load( file => $pwfile );
 
-	$raps2->ui->to_clipboard( $key->{password} )
+	$raps2->ui->to_clipboard( $key->{password}, $raps2->conf('xclip_cmd') )
 	  or die("Could not place password in clipboard: ${!}\n");
 
 	if ( $key->{extra} ) {
@@ -324,6 +326,8 @@ Decrypt I<account>'s password and store it in the primary X Clipboard.  Note
 that it can only be pasted once.  Prints the content of the multiline B<extra>
 field (if present) to stdout.
 
+See also the B<-x> option.
+
 =item B<info> I<account>
 
 Show information about I<account>, does not require the master password.
@@ -378,6 +382,13 @@ Default: pwgen -s 23 1
 
 Show version information.
 
+=item B<-x>, B<--xclip-cmd> I<command>
+
+Command to run for B<raps2 get>.  Set this to C<< xclip -l 2 >> if you are
+using chrome.  The password will be available on I<command>'s stdin.
+
+Default: xclip -l 1
+
 =back
 
 =head1 EXIT STATUS
@@ -395,6 +406,27 @@ Additional encrypted passwords are stored in F<~/.local/share/raps2/>.
 
 These directories can be changed by setting the B<XDG_CONFIG_HOME> and
 B<XDG_DATA_HOME> environment variables.
+
+The following settings are available in F<~/.config/raps2/defaults>:
+
+=over
+
+=item B<cost> = 12
+
+Default key setup cost.  See the B<-c> option.
+
+=item B<pwgen_cmd> = pwgen -s 23 1
+
+Command used to generate passwords.  See the B<-p> option.
+
+=item B<xclip_cmd> = xclip -l 1
+
+Command used to place passwords in the clipboard.  See the B<-x> option.
+
+=back
+
+Note that commandline arguments always override options set in the
+configuration file.
 
 =head1 DEPENDENCIES
 
