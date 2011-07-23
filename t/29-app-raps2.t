@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 $ENV{XDG_CONFIG_HOME} = 't/config';
 $ENV{XDG_DATA_HOME}   = 't/data';
@@ -60,7 +60,10 @@ is( $r2->pw_load( file => 't/data/raps2/test2' )->{password},
 is( $r2->pw_load( file => 't/data/raps2/test2' )->{extra},
 	'mextra', 'Extra for test2 loaded ok' );
 
-is ( $r2->generate_password(), '123', 'generate_password + pwgen_cmd ok' );
+is( $r2->generate_password(), '123', 'generate_password + pwgen_cmd ok' );
+
+is( $r2->conf('pwgen_cmd'), 'echo 123 456', 'conf->pwgen_cmd ok' );
+is( $r2->conf('xclip_cmd'), 'xclip -l 1', 'conf->xclip_cmd ok' );
 
 unlink('t/data/raps2/test1');
 unlink('t/data/raps2/test2');
