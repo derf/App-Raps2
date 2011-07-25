@@ -13,7 +13,7 @@ use Getopt::Long qw(:config no_ignore_case);
 
 my ( $chrome, $default_cost, $no_echo, $paste, $pwgen_cmd, $xclip_cmd );
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 GetOptions(
 	'c|cost=i'      => \$default_cost,
@@ -282,7 +282,7 @@ B<raps2> [I<options>] I<action> [I<args ...>]
 
 =head1 VERSION
 
-This manual documents B<raps2> version 0.52
+This manual documents B<raps2> version 0.53
 
 =head1 DESCRIPTION
 
@@ -340,10 +340,6 @@ Show information about I<account>, does not require the master password.
 =item B<list>
 
 List all saved accounts with their respective Logins and URLs
-
-=item B<version>
-
-Show version information
 
 =back
 

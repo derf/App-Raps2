@@ -12,7 +12,7 @@ use File::BaseDir qw(config_home data_home);
 use File::Path qw(make_path);
 use File::Slurp qw(slurp write_file);
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 sub new {
 	my ( $class, %opt ) = @_;
@@ -302,7 +302,7 @@ B<App::Raps2> is the backend for B<raps2>, a simple commandline password safe.
 
 =head1 VERSION
 
-This manual documents App::Raps2 version 0.52
+This manual documents App::Raps2 version 0.53
 
 =head1 METHODS
 

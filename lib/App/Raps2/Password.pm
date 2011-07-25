@@ -9,7 +9,7 @@ use Crypt::CBC;
 use Crypt::Eksblowfish;
 use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash en_base64 de_base64);
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -135,7 +135,7 @@ App::Raps2::Password - Password class for App::Raps2
 
 =head1 VERSION
 
-This manual documents B<App::Raps2::Password> version 0.52
+This manual documents B<App::Raps2::Password> version 0.53
 
 =head1 DESCRIPTION
 
