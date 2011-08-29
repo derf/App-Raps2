@@ -15,8 +15,6 @@ sub new {
 
 	my $ref = {};
 
-	$ref->{term_readline} = Term::ReadLine->new('App::Raps2');
-
 	return bless( $ref, $obj );
 }
 
@@ -36,6 +34,12 @@ sub list {
 
 sub read_line {
 	my ( $self, $str, $pre ) = @_;
+
+	# Term::ReadLine->new() takes quite long but is not always required.
+	# So create it here (if needed) instead of in ->new
+	if ( not $self->{term_readline} ) {
+		$self->{term_readline} = Term::ReadLine->new('App::Raps2');
+	}
 
 	my $input = $self->{term_readline}->readline( "${str}: ", $pre );
 
