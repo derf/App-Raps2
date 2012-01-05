@@ -47,7 +47,7 @@ sub file_to_hash {
 	my $ret;
 
 	for my $line ( slurp($file) ) {
-		my ( $key, $value ) = split( qr{ \s+ }x, $line );
+		my ( $key, $value ) = ( $line =~ m{ ^ ([^ ]+) \s+ (.+) $ }x );
 
 		if ( not( $key and $value ) ) {
 			next;
