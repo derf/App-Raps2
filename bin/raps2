@@ -6,6 +6,8 @@ use strict;
 use warnings;
 use 5.010;
 
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+
 use App::Raps2;
 use File::BaseDir qw(data_files data_home);
 use File::Slurp qw(read_dir);
