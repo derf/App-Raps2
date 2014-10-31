@@ -135,6 +135,30 @@ sub cmd_dump {
 	return;
 }
 
+sub cmd_dump_all {
+	my @files = read_dir( data_home('raps2') );
+
+	$raps2->get_master_password();
+
+	for my $file (@files) {
+		my $key = $raps2->pw_load( file => data_files("raps2/${file}") );
+
+		$raps2->ui->output(
+			[ 'Key',      $file ],
+			[ 'URL',      $key->{url} ],
+			[ 'Login',    $key->{login} ],
+			[ 'Password', $key->{password} ],
+		);
+		if ( $key->{extra} ) {
+			print $key->{extra};
+		}
+
+		print "\n";
+	}
+
+	return;
+}
+
 sub cmd_edit {
 	my ($name) = @_;
 
@@ -261,13 +285,14 @@ sub cmd_remove {
 }
 
 given ($action) {
-	when ('add')  { cmd_add(@args) }
-	when ('del')  { cmd_remove(@args) }
-	when ('dump') { cmd_dump(@args) }
-	when ('edit') { cmd_edit(@args) }
-	when ('get')  { cmd_get(@args) }
-	when ('info') { cmd_info(@args) }
-	when ('list') { cmd_list(@args) }
+	when ('add')      { cmd_add(@args) }
+	when ('del')      { cmd_remove(@args) }
+	when ('dump')     { cmd_dump(@args) }
+	when ('dump-all') { cmd_dump_all(@args) }
+	when ('edit')     { cmd_edit(@args) }
+	when ('get')      { cmd_get(@args) }
+	when ('info')     { cmd_info(@args) }
+	when ('list')     { cmd_list(@args) }
 
 	default { cmd_help(1) }
 }
