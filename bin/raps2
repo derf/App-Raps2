@@ -347,6 +347,10 @@ Remove I<account> from the store.
 Dump everything saved for I<account>, including the clear-text password, to
 stdout.
 
+=item B<dump-all>
+
+Dump data for all accounts, including their clear-text passwords, to stdout.
+
 =item B<edit> I<account>
 
 Edit saved data for I<account>.  Note that editing the multiline "extra" field

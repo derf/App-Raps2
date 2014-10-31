@@ -1,3 +1,7 @@
+git HEAD
+
+    * add dump-all command
+
 App::Raps2 0.53 - Mon Jul 25 2011
 
     * Make xclip command configurable (for chrome users, mostly)
