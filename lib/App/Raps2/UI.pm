@@ -8,7 +8,7 @@ use Carp qw(cluck confess);
 use POSIX;
 use Term::ReadLine;
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 sub new {
 	my ($obj) = @_;
@@ -138,7 +138,7 @@ App::Raps2::UI - App::Raps2 User Interface
 
 =head1 VERSION
 
-This manual documents B<App::Raps2::UI> version 0.53
+This manual documents B<App::Raps2::UI> version 0.54
 
 =head1 DESCRIPTION
 

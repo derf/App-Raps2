@@ -15,7 +15,7 @@ use Getopt::Long qw(:config no_ignore_case);
 
 my ( $chrome, $default_cost, $no_echo, $paste, $pwgen_cmd, $xclip_cmd );
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 GetOptions(
 	'c|cost=i'      => \$default_cost,
@@ -309,7 +309,7 @@ B<raps2> [I<options>] I<action> [I<args ...>]
 
 =head1 VERSION
 
-This manual documents B<raps2> version 0.53
+This manual documents B<raps2> version 0.54
 
 =head1 DESCRIPTION
 

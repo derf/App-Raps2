@@ -1,4 +1,4 @@
-git HEAD
+App::Raps2 0.54 - Sun Oct 04 2015
 
     * add dump-all command
     * Fix smartmatch warnings on perl ≥ 5.18
