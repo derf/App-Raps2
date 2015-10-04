@@ -7,6 +7,7 @@ Dependencies
 ------------
 
  * perl version 5.10 or newer
+ * Config::Tiny
  * Crypt::CBC
  * Crypt::Eksblowfish
  * File::BaseDir

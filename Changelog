@@ -1,6 +1,7 @@
 git HEAD
 
     * add dump-all command
+    * Fix smartmatch warnings on perl ≥ 5.18
 
 App::Raps2 0.53 - Mon Jul 25 2011
 

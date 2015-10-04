@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
-## Copyright © 2011 by Daniel Friesel <derf@finalrewind.org>
+## Copyright © 2011-2015 by Daniel Friesel <derf@finalrewind.org>
 ## License: WTFPL:
 ##   0. You just DO WHAT THE FUCK YOU WANT TO.
 use strict;
 use warnings;
 use 5.010;
 
-no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use App::Raps2;
 use File::BaseDir qw(data_files data_home);
@@ -502,7 +502,7 @@ three times. Two would be better.
 
 =head1 AUTHOR
 
-Copyright (C) 2011 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 
