@@ -29,5 +29,10 @@ my $build = Module::Build->new(
 	},
 	script_files => 'bin/',
 	sign => 1,
+	meta_merge => {
+		resources => {
+			repository => 'https://github.com/derf/App-Raps2'
+		}
+	},
 );
 $build->create_build_script();
