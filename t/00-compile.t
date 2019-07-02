@@ -5,4 +5,6 @@ use 5.010;
 use Test::More;
 use Test::Compile;
 
-all_pl_files_ok('bin/raps2');
+my $test = Test::Compile->new();
+$test->all_files_ok('bin/raps2');
+$test->done_testing();
