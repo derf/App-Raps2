@@ -6,7 +6,7 @@ use Module::Build;
 
 my $build = Module::Build->new(
 	build_requires => {
-		'Test::Compile' => 0,
+		'Test::Compile' => "1.3.0",
 		'Test::Fatal' => 0,
 		'Test::More' => 0,
 		'Test::Pod' => 0,
@@ -29,5 +29,10 @@ my $build = Module::Build->new(
 	},
 	script_files => 'bin/',
 	sign => 1,
+	meta_merge => {
+		resources => {
+			repository => 'https://github.com/derf/App-Raps2'
+		}
+	},
 );
 $build->create_build_script();
