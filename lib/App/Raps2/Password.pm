@@ -66,7 +66,7 @@ sub encrypt {
 
 	my $eksblowfish
 	  = Crypt::Eksblowfish->new( $opt{cost}, $opt{salt}, $self->{passphrase}, );
-	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish );
+	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish, -keysize => 56 );
 
 	return $cbc->encrypt_hex( $opt{data} );
 }
@@ -79,7 +79,7 @@ sub decrypt {
 
 	my $eksblowfish
 	  = Crypt::Eksblowfish->new( $opt{cost}, $opt{salt}, $self->{passphrase}, );
-	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish );
+	my $cbc = Crypt::CBC->new( -cipher => $eksblowfish, -keysize => 56 );
 
 	return $cbc->decrypt_hex( $opt{data} );
 }
